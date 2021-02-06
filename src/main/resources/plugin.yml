@@ -1,0 +1,9 @@
+main: fun.fifu.fifusky.FiFuSky
+version: 2.33
+name: FiFuSky
+author: NekokeCore
+#api-version: 1.16
+commands:
+  s:
+    description: "回到自己的岛"
+    usage: /s 回到自己的岛
