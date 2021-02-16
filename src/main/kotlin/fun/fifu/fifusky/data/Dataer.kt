@@ -46,7 +46,7 @@ object Dataer {
      * @return 岛屿信息
      */
     fun getIsLandData(isLand: IsLand): IsLandData {
-        val temp = Db.use().findAll(Entity.create(SkyIsLand).set("SkyLoc", isLand.SkyLoc))
+        val temp = Db.use().findAll(Entity.create(SkyIsLand).set("SkyLoc", isLand.toString()))
         return if (temp.isNotEmpty()) {
             val ownerPlayersData = getPlayersData(temp[0].getStr("OwnersList").toString())
             val memberPlayersData = getPlayersData(temp[0].getStr("MembersList").toString())
@@ -261,8 +261,41 @@ object Dataer {
                 Entity.create(PlayerData).set("UUID", playerUUID)
             )
         }
-
-
     }
 
+    /**
+     * 把IslandData保存到数据库
+     * @param isLandData 岛屿数据
+     */
+    fun saveIslandData(isLandData: IsLandData) {
+        val skyLoc = isLandData.IsLand.toString()
+
+        val membersList = JSONUtil.createArray()
+        val ownersList = JSONUtil.createArray()
+        isLandData.Privilege.Owner.forEach {
+            ownersList.add(it.UUID)
+            savePlayerName(it.UUID,it.LastName)
+        }
+        isLandData.Privilege.Member.forEach {
+            membersList.add(it.UUID)
+            savePlayerName(it.UUID,it.LastName)
+        }
+
+        if (Db.use().findAll(Entity.create(SkyIsLand).set("SkyLoc", skyLoc)).isEmpty()) {
+            Db.use().insert(
+                Entity.create(SkyIsLand)
+                    .set("SkyLoc", skyLoc)
+                    .set("OwnersList", ownersList.toString())
+                    .set("MembersList", membersList.toString())
+            )
+        } else {
+            Db.use().update(
+                Entity.create()
+                    .set("SkyLoc", skyLoc)
+                    .set("OwnersList", ownersList.toString())
+                    .set("MembersList", membersList.toString()),
+                Entity.create(SkyIsLand).set("SkyLoc", skyLoc)
+            )
+        }
+    }
 }

@@ -12,8 +12,8 @@ import kotlin.math.abs
  * @author NekokeCore
  */
 object Sky {
-    private const val SIDE = 1024
-    private const val MAX_ISLAND = 29296
+    const val SIDE = 1024
+    const val MAX_ISLAND = 29296
     private fun getR(SkyR: Int): Int = SIDE * SkyR
     private fun getRR(SkyR: Int): Int = SIDE * (SkyR + 1) - 1
 
