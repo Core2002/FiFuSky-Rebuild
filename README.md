@@ -10,9 +10,9 @@ FiFuSky-Rebuild
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  clone
+2.  把服务器核心、插件之类的依赖放入libs文件夹
+3.  gradle build
 
 #### 使用说明
 
