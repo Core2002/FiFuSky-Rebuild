@@ -3,6 +3,7 @@ package `fun`.fifu.fifusky.commands
 import `fun`.fifu.fifusky.IsLand
 import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.data.Dataer
+import `fun`.fifu.fifusky.data.PlayerData
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -26,6 +27,10 @@ class SkyCommand : CommandExecutor {
                 temp = Dataer.getPlayerIndex("($xx,$zz)")
             } while (Dataer.getIsLandData(temp).Privilege.Owner.isNullOrEmpty())
 
+            val iLD = Dataer.getIsLandData(temp)
+            iLD.Privilege.Owner.add(PlayerData(p0.uniqueId.toString(),p0.name))
+            Dataer.saveIslandData(iLD)
+            Dataer.savePlayerIndex(p0.uniqueId.toString(),temp.toString())
             temp
         }
 
