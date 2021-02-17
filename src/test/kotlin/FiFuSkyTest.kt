@@ -1,6 +1,5 @@
 import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.data.Dataer
-import `fun`.fifu.fifusky.data.PlayerData
 
 class FiFuSkyTest {
 

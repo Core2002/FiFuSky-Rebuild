@@ -2,7 +2,7 @@
 ## 基本配置信息
 # JDBC URL，根据不同的数据库，使用相应的JDBC连接字符串
 # url = jdbc:mysql://<host>:<port>/<database_name>
-url = jdbc:sqlite:FiFuSky.db
+url = jdbc:sqlite:plugins/FiFuSky/FiFuSky.db
 # 用户名，此处也可以使用 user 代替
 # username = 用户名
 # 密码，此处也可以使用 pass 代替
