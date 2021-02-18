@@ -1,6 +1,3 @@
-import `fun`.fifu.fifusky.Sky
-import `fun`.fifu.fifusky.data.Dataer
-
 class FiFuSkyTest {
 
     companion object {
@@ -19,7 +16,14 @@ class FiFuSkyTest {
 //        a.Privilege.Member.add(PlayerData("xwx","yxl"))
 //        Dataer.saveIslandData(a)
 //        println(a)
-        println(Dataer.getIsLandData(Sky.getIsLand("(0,0)")))
+
+
+        val sj = Triple(3, 82, -114)
+        val xj = Triple(12, 70, -120)
+
+        val qw = Triple(8, 75, -117)
+
+
     }
 
 

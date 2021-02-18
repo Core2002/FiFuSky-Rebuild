@@ -3,6 +3,7 @@ package `fun`.fifu.fifusky.commands
 import `fun`.fifu.fifusky.IsLand
 import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.SkyOperator
+import `fun`.fifu.fifusky.SkyOperator.BuildIsLand
 import `fun`.fifu.fifusky.data.Dataer
 import `fun`.fifu.fifusky.data.PlayerData
 import org.bukkit.Bukkit
@@ -30,6 +31,8 @@ class SkyCommand : CommandExecutor {
                 temp = Sky.getIsLand(xx, zz)
             } while (!Dataer.getIsLandData(temp).Privilege.Owner.isNullOrEmpty())
 
+            BuildIsLand(temp)
+
             val iLD = Dataer.getIsLandData(temp)
             iLD.Privilege.Owner.add(PlayerData(p0.uniqueId.toString(), p0.name))
             Dataer.saveIslandData(iLD)
@@ -39,14 +42,16 @@ class SkyCommand : CommandExecutor {
 
         // 如果玩家现在在主城，就回自己岛，不在主城就回主城
         if (Sky.isInIsLand(Pair(p0.location.blockX, p0.location.blockZ), Sky.getIsLand("(0,0)"))) {
+            p0.sendMessage("欢迎回家")
             SkyOperator.TpIsLand(p0, isLand)
         } else {
+            p0.sendMessage("欢迎回到主城")
             p0.teleport(
                 Location(
                     Bukkit.getWorld("world"),
-                    512.0,
-                    65.0,
-                    512.0
+                    8.0,
+                    4.0,
+                    8.0
                 )
             )
         }

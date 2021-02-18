@@ -1,10 +1,9 @@
 package `fun`.fifu.fifusky
 
+import `fun`.fifu.fifusky.commands.BuildIsLandCommand
 import `fun`.fifu.fifusky.commands.SkyCommand
 import `fun`.fifu.fifusky.data.Dataer
-import cn.hutool.core.io.FileUtil
-import cn.hutool.core.io.resource.ClassPathResource
-import cn.hutool.db.Db
+import `fun`.fifu.fifusky.listeners.PlayerListener
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -15,7 +14,12 @@ import java.io.File
  */
 class FiFuSky : JavaPlugin() {
 
+    companion object {
+        lateinit var fiFuSky: FiFuSky
+    }
+
     override fun onLoad() {
+        fiFuSky = this
         val f = File("plugins/FiFuSky")
         if (!f.isDirectory)
             f.mkdirs()
@@ -30,8 +34,11 @@ class FiFuSky : JavaPlugin() {
     override fun onEnable() {
         //注册命令
         Bukkit.getPluginCommand("s")?.setExecutor(SkyCommand())
+        Bukkit.getPluginCommand("build-island")?.setExecutor(BuildIsLandCommand())
+
         //注册监听器
-        //pluginManager.registerEvents(PlayerListener(), this)
+        server.pluginManager.registerEvents(PlayerListener(), this)
+
         logger.info("FiFu空岛插件已启动！")
     }
 }
