@@ -41,7 +41,7 @@ class SkyCommand : CommandExecutor {
         }
 
         // 如果玩家现在在主城，就回自己岛，不在主城就回主城
-        if (Sky.isInIsLand(Pair(p0.location.blockX, p0.location.blockZ), Sky.getIsLand("(0,0)"))) {
+        if (Sky.isInIsLand(p0.location.blockX, p0.location.blockZ, Sky.getIsLand("(0,0)"))) {
             p0.sendMessage("欢迎回家")
             SkyOperator.TpIsLand(p0, isLand)
         } else {

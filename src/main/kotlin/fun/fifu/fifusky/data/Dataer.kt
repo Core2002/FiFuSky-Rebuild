@@ -273,11 +273,11 @@ object Dataer {
         val ownersList = JSONUtil.createArray()
         isLandData.Privilege.Owner.forEach {
             ownersList.add(it.UUID)
-            savePlayerName(it.UUID,it.LastName)
+            savePlayerName(it.UUID, it.LastName)
         }
         isLandData.Privilege.Member.forEach {
             membersList.add(it.UUID)
-            savePlayerName(it.UUID,it.LastName)
+            savePlayerName(it.UUID, it.LastName)
         }
 
         if (Db.use().findAll(Entity.create(SkyIsLand).set("SkyLoc", skyLoc)).isEmpty()) {
@@ -297,4 +297,27 @@ object Dataer {
             )
         }
     }
+
+    /**
+     * 获取区块数据
+     * @param chunkLoc 区块坐标
+     * @return 区块数据
+     */
+    fun getChunkData(chunkLoc: String): ChunkData {
+        val temp = Db.use().findAll(Entity.create(ChunkData).set("Chunk", chunkLoc))
+        return if (temp.isNotEmpty()) {
+            ChunkData(chunkLoc, temp[0].getBool("AllowExplosion"))
+        } else {
+            ChunkData(chunkLoc, false)
+        }
+    }
+
+    /**
+     * 保存区块信息
+     * @param chunkData 区块信息
+     */
+    fun setChunkData(chunkData: ChunkData){
+        //todo
+    }
+
 }

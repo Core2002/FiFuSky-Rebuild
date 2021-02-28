@@ -1,5 +1,6 @@
 package `fun`.fifu.fifusky
 
+import `fun`.fifu.fifusky.data.Dataer
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -65,7 +66,7 @@ object SkyOperator {
             )!!.blockData = b
         }
 
-        FiFuSky.fiFuSky.logger.info("复制完毕！$isLand 耗时 ${System.currentTimeMillis() - t} ms。")
+        FiFuSky.logger.info("复制完毕！$isLand 耗时 ${System.currentTimeMillis() - t} ms。")
     }
 
 
@@ -84,5 +85,37 @@ object SkyOperator {
                     arr.add(Triple(xx, yy, zz))
         return arr
     }
+
+    /**
+     * 判断玩家当前是否有权限
+     * @param player 要查验权限的玩家
+     * @return 是否有权限
+     */
+    fun havePermission(player: Player): Boolean {
+        val location = player.location
+        if (Sky.WORLD != location.world.name)
+            return true
+        val uuid = player.uniqueId.toString()
+
+        val privilege = Dataer.getIsLandData(Sky.getIsLand(location.blockX, location.blockZ)).Privilege
+        privilege.Owner.forEach {
+            if (uuid == it.UUID)
+                return true
+        }
+        privilege.Member.forEach {
+            if (uuid == it.UUID)
+                return true
+        }
+
+        return false
+    }
+
+    /**
+     * 查询区块是否允许爆炸
+     * @param chunckLoc 区块坐标
+     * @return 该区块是否允许爆炸
+     */
+    fun canExplosion(chunckLoc: String): Boolean = Dataer.getChunkData(chunckLoc).AllowExplosion
+
 
 }

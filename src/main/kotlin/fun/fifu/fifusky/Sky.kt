@@ -14,6 +14,8 @@ import kotlin.math.abs
 object Sky {
     const val SIDE = 1024
     const val MAX_ISLAND = 29296
+    const val WORLD = "world"
+    val SPAWN = getIsLand("(0,0)")
     private fun getR(SkyR: Int): Int = SIDE * SkyR
     private fun getRR(SkyR: Int): Int = SIDE * (SkyR + 1) - 1
 
@@ -68,8 +70,8 @@ object Sky {
      * @param isLand 岛屿对象
      * @return 返回True则真，False则假
      */
-    fun isInIsLand(loc: Pair<Int, Int>, isLand: IsLand) =
-        loc.first in isLand.X..isLand.XX && loc.second in isLand.Y..isLand.YY
+    fun isInIsLand(xx: Int, zz: Int, isLand: IsLand) =
+        xx in isLand.X..isLand.XX && zz in isLand.Y..isLand.YY
 
     /**
      * 获取指定坐标所在的岛屿坐标

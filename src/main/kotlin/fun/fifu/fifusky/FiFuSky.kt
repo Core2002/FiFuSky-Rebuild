@@ -4,6 +4,8 @@ import `fun`.fifu.fifusky.commands.BuildIsLandCommand
 import `fun`.fifu.fifusky.commands.SkyCommand
 import `fun`.fifu.fifusky.data.Dataer
 import `fun`.fifu.fifusky.listeners.PlayerListener
+import `fun`.fifu.fifusky.listeners.permission.BlockListener
+import `fun`.fifu.fifusky.listeners.permission.EntityListener
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
@@ -12,14 +14,8 @@ import java.io.File
  * FiFuSky插件主类
  * @author NekokeCore
  */
-class FiFuSky : JavaPlugin() {
-
-    companion object {
-        lateinit var fiFuSky: FiFuSky
-    }
-
+object FiFuSky : JavaPlugin() {
     override fun onLoad() {
-        fiFuSky = this
         val f = File("plugins/FiFuSky")
         if (!f.isDirectory)
             f.mkdirs()
@@ -38,6 +34,8 @@ class FiFuSky : JavaPlugin() {
 
         //注册监听器
         server.pluginManager.registerEvents(PlayerListener(), this)
+        server.pluginManager.registerEvents(BlockListener(), this)
+        server.pluginManager.registerEvents(EntityListener(), this)
 
         logger.info("FiFu空岛插件已启动！")
     }

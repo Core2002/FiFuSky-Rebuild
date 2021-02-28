@@ -1,3 +1,7 @@
+import `fun`.fifu.fifusky.data.Dataer
+import kotlinx.coroutines.*
+import java.util.concurrent.TimeUnit
+
 class FiFuSkyTest {
 
     companion object {
@@ -10,18 +14,17 @@ class FiFuSkyTest {
 
     fun test() {
         println("OK")
-//        val a = Dataer.getIsLandData(Sky.getIsLand("(0,0)"))
-//        a.Privilege.Owner.add(PlayerData("awa","zxb"))
-//        a.Privilege.Member.add(PlayerData("qwq","xyl"))
-//        a.Privilege.Member.add(PlayerData("xwx","yxl"))
-//        Dataer.saveIslandData(a)
-//        println(a)
 
 
-        val sj = Triple(3, 82, -114)
-        val xj = Triple(12, 70, -120)
+//        GlobalScope.launch { // 在后台启动一个新的协程并继续
+//            delay(1000L) // 非阻塞的等待 1 秒钟（默认时间单位是毫秒）
+//            println("World!") // 在延迟后打印输出
+//        }
+//        println("Hello,") // 协程已在等待时主线程还在继续
+//
+//        Thread.sleep(2000L) // 阻塞主线程 2 秒钟来保证 JVM 存活
 
-        val qw = Triple(8, 75, -117)
+        println(Dataer.getChunkData("[0,0]"))
 
 
     }
