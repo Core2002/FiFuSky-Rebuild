@@ -1,7 +1,7 @@
 package `fun`.fifu.fifusky.listeners.permission
 
 import `fun`.fifu.fifusky.Sky
-import `fun`.fifu.fifusky.SkyOperator
+import `fun`.fifu.fifusky.operators.SkyOperator
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
@@ -34,7 +34,7 @@ class BlockListener : Listener {
      */
     @EventHandler
     fun onBlockBurn(event: BlockBurnEvent) {
-        if (event.block.location.world.name == Sky.WORLD) {
+        if (SkyOperator.isSkyWorld(event.block.location.world)) {
             event.isCancelled = true
         }
     }
@@ -103,8 +103,8 @@ class BlockListener : Listener {
      */
     @EventHandler
     fun onBlockIgnite(event: BlockIgniteEvent) {
-        if (event.block.world.name != Sky.WORLD) return
-        if (event.block.location.world.name == Sky.WORLD && event.cause != BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL) {
+        if (!SkyOperator.isSkyWorld(event.block.world)) return
+        if (event.cause != BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL) {
             event.isCancelled = true
             return
         }

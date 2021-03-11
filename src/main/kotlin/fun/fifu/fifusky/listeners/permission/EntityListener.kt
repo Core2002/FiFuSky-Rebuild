@@ -1,7 +1,7 @@
 package `fun`.fifu.fifusky.listeners.permission
 
 import `fun`.fifu.fifusky.Sky
-import `fun`.fifu.fifusky.SkyOperator
+import `fun`.fifu.fifusky.operators.SkyOperator
 import org.bukkit.Chunk
 import org.bukkit.entity.*
 import org.bukkit.event.EventHandler
@@ -14,21 +14,22 @@ import org.bukkit.inventory.CraftingInventory
 import org.bukkit.inventory.EnchantingInventory
 import org.bukkit.inventory.MerchantInventory
 import org.bukkit.inventory.PlayerInventory
+import org.bukkit.entity.Player
 
 
 class EntityListener : Listener {
     /**
      * 当一个生物体在世界中出生时触发该事件.
      *
-     * @param creatureSpawnEvent
+     * @param event
      */
     @EventHandler
-    fun onCreatureSpawn(creatureSpawnEvent: CreatureSpawnEvent) {
-        if (creatureSpawnEvent.location.world.name != Sky.WORLD) return
-        val xx = creatureSpawnEvent.location.x.toInt()
-        val zz = creatureSpawnEvent.location.z.toInt()
-        if (Sky.isInIsLand(xx, zz, Sky.SPAWN) && creatureSpawnEvent.entity is Monster) {
-            creatureSpawnEvent.isCancelled = true
+    fun onCreatureSpawn(event: CreatureSpawnEvent) {
+        if (event.location.world.name != Sky.WORLD) return
+        val xx = event.location.x.toInt()
+        val zz = event.location.z.toInt()
+        if (Sky.isInIsLand(xx, zz, Sky.SPAWN) && event.entity is Monster) {
+            event.isCancelled = true
         }
     }
 
@@ -115,7 +116,7 @@ class EntityListener : Listener {
             } else if (event.damager is Projectile) {
                 if ((event.damager as Projectile).shooter is Player) {
                     val player = (event.damager as Projectile).shooter as Player?
-//                    Helper.showDamage(player, entity as LivingEntity)
+                    if (player != null) SkyOperator.showDamage(player, entity)
                     if (entity !is Monster && player != null && !SkyOperator.havePermission(player) && !Sky.isInIsLand(
                             loc.blockX,
                             loc.blockZ,
@@ -129,4 +130,5 @@ class EntityListener : Listener {
             }
         }
     }
+
 }

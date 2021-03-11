@@ -12,7 +12,7 @@ import java.util.*
  * 用来管理数据库的单例
  * @author NekokeCore
  */
-object Dataer {
+object SQLiteer {
 
 //    private const val base = "plugins/FiFuSky/"
 //

@@ -1,6 +1,4 @@
-import `fun`.fifu.fifusky.data.Dataer
-import kotlinx.coroutines.*
-import java.util.concurrent.TimeUnit
+import `fun`.fifu.fifusky.data.SQLiteer
 
 class FiFuSkyTest {
 
@@ -24,7 +22,14 @@ class FiFuSkyTest {
 //
 //        Thread.sleep(2000L) // 阻塞主线程 2 秒钟来保证 JVM 存活
 
-        println(Dataer.getChunkData("[0,0]"))
+        val HelpMassage = mapOf(
+            "get" to "领取一个岛屿，两个月只能领一次",
+            "asa" to "bbb",
+            "ccc" to "owo"
+        )
+        val sb = StringBuffer()
+        HelpMassage.values.forEach { sb.append(it).append("\n") }
+        println(sb)
 
 
     }

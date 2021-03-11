@@ -7,6 +7,6 @@ commands:
   s:
     description: "回到自己的岛"
     usage: /s 回到自己的岛
-  build-island:
-    description: "复制一个岛到指定位置"
-    usage: /build-island <SkyLoc>
+  fs-admin:
+    description: "管理员命令"
+    usage: /fs-admin help 查看帮助

@@ -34,7 +34,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.8'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'cn.hutool:hutool-all:5.5.8'
+    implementation 'cn.hutool:hutool-all:5.5.9'
 
 }
 
