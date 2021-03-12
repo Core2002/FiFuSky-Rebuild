@@ -1,21 +1,23 @@
 package `fun`.fifu.fifusky.operators
 
+import SoundPlayer
 import `fun`.fifu.fifusky.FiFuSky
 import `fun`.fifu.fifusky.IsLand
 import `fun`.fifu.fifusky.Sky
+import `fun`.fifu.fifusky.data.Jsoner
 import `fun`.fifu.fifusky.data.PlayerData
 import `fun`.fifu.fifusky.data.SQLiteer
-import cn.hutool.db.sql.SqlBuilder
+import cn.hutool.core.date.DateUtil
+import org.apache.commons.lang.time.DateUtils
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.data.BlockData
+import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
-
-import org.bukkit.entity.LivingEntity
 
 
 object SkyOperator {
@@ -184,7 +186,7 @@ object SkyOperator {
      * @param 目标岛屿
      * @return 目标岛屿的主人列表
      */
-    fun getOwnersList(isLand: IsLand)  {
+    fun getOwnersList(isLand: IsLand) {
         val sb = StringBuffer()
         val owner = SQLiteer.getIsLandData(isLand).Privilege.Owner
         owner.forEach {
@@ -197,14 +199,25 @@ object SkyOperator {
      * @param isLand 目标岛屿
      * @param player 要添加的主人
      */
-    fun addOwener(isLand: IsLand,player: Player){
+    fun addOwener(isLand: IsLand, player: Player) {
         val uuid = player.uniqueId.toString()
         val isLandData = SQLiteer.getIsLandData(isLand)
         isLandData.Privilege.Owner.forEach {
-            if (uuid==it.UUID)
+            if (uuid == it.UUID)
                 return
         }
-        isLandData.Privilege.Owner.add(PlayerData(UUID = uuid,LastName = player.name))
+        isLandData.Privilege.Owner.add(PlayerData(UUID = uuid, LastName = player.name))
         SQLiteer.saveIslandData(isLandData)
+    }
+
+    /**
+     * 判断一个文件是否可以领取岛
+     * @param player 要判断的玩家
+     * @return 第一个：是否可以领取岛，第二个：什么时间后可以领取
+     */
+    fun canGet(player: Player): Pair<Boolean, String> {
+        val uuid = player.uniqueId.toString()
+        val time = System.currentTimeMillis() - Jsoner.getPlayerLastGet(uuid)
+        return Pair(time > DateUtils.MILLIS_PER_DAY * 30 * 2, DateUtil.formatBetween(-time))
     }
 }

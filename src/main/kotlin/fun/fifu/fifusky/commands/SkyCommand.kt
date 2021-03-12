@@ -37,14 +37,18 @@ class SkyCommand : CommandExecutor {
 
     private fun onGet(player: Player, p3: Array<out String>): Boolean {
         if (p3[1].isEmpty()) player.sendMessage(HelpMassage["get"]!!)
+        if (!SkyOperator.canGet(player).first) {
+            player.sendMessage("每两个月只能领取一次岛，${SkyOperator.canGet(player).second}后可再次领取")
+            return true
+        }
         val s = p3[1]
         val isLand = Sky.getIsLand(s)
-        if (SkyOperator.isUnclaimed(isLand)){
+        if (SkyOperator.isUnclaimed(isLand)) {
             buildIsLand(isLand)
-            SkyOperator.addOwener(isLand,player)
-            SkyOperator.tpIsLand(player,isLand)
-        }else{
-            player.sendMessage("岛屿 $isLand 不是无人的，主人是${SkyOperator.getOwnersList(isLand)}")
+            SkyOperator.addOwener(isLand, player)
+            SkyOperator.tpIsLand(player, isLand)
+        } else {
+            player.sendMessage("岛屿 $isLand 已经有人领过了，主人是${SkyOperator.getOwnersList(isLand)}")
         }
         return true
     }

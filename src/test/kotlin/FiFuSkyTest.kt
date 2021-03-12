@@ -1,4 +1,7 @@
+import `fun`.fifu.fifusky.data.Jsoner
 import `fun`.fifu.fifusky.data.SQLiteer
+import cn.hutool.core.date.BetweenFormatter
+import cn.hutool.core.date.DateUtil
 
 class FiFuSkyTest {
 
@@ -22,15 +25,8 @@ class FiFuSkyTest {
 //
 //        Thread.sleep(2000L) // 阻塞主线程 2 秒钟来保证 JVM 存活
 
-        val HelpMassage = mapOf(
-            "get" to "领取一个岛屿，两个月只能领一次",
-            "asa" to "bbb",
-            "ccc" to "owo"
-        )
-        val sb = StringBuffer()
-        HelpMassage.values.forEach { sb.append(it).append("\n") }
-        println(sb)
 
+        println(DateUtil.formatBetween(-86480007090L))
 
     }
 
