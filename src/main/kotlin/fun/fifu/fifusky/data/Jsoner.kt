@@ -5,7 +5,7 @@ import cn.hutool.json.JSONUtil
 import java.io.File
 
 object Jsoner {
-    val cache = LFUFileCache(1000, 50, 5000)
+    private val cache = LFUFileCache(1000, 50, 5000)
     private val PlayerLastGet = File("plugins/FiFuSky/PlayerLastGet.json")
 
     /**
@@ -15,11 +15,11 @@ object Jsoner {
      */
     fun getPlayerLastGet(uuid: String): Long {
         if (!PlayerLastGet.isFile) PlayerLastGet.writeText("{}")
-        val obj = JSONUtil.parseObj(PlayerLastGet.readText())
+        val obj = JSONUtil.parseObj(cache.getFileBytes(PlayerLastGet).toString())
         if (uuid in obj) {
             return obj[uuid].toString().toLong()
         }
-        return -1L
+        return 0L
     }
 
     /**

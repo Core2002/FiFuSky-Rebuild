@@ -18,7 +18,7 @@ import kotlin.random.Random
  * 玩家命令
  */
 class SkyCommand : CommandExecutor {
-    private val HelpMassage = mapOf(
+    private val helpMassage = mapOf(
         "get" to "/get <SkyLoc> 领取一个岛屿，两个月只能领一次"
     )
 
@@ -27,7 +27,7 @@ class SkyCommand : CommandExecutor {
             p0.sendMessage("你必须是一名玩家")
             return true
         }
-        if (p3.isNullOrEmpty()) return onS(p0, p3)
+        if (p3.isNullOrEmpty()) return onS(p0)
         return when (p3[0]) {
             "get" -> onGet(p0, p3)
             "help" -> onHelp(p0)
@@ -36,16 +36,16 @@ class SkyCommand : CommandExecutor {
     }
 
     private fun onGet(player: Player, p3: Array<out String>): Boolean {
-        if (p3[1].isEmpty()) player.sendMessage(HelpMassage["get"]!!)
+        if (p3[1].isEmpty()) player.sendMessage(helpMassage["get"]!!)
         if (!SkyOperator.canGet(player).first) {
             player.sendMessage("每两个月只能领取一次岛，${SkyOperator.canGet(player).second}后可再次领取")
             return true
         }
-        val s = p3[1]
-        val isLand = Sky.getIsLand(s)
+        val isLand = Sky.getIsLand(p3[1])
         if (SkyOperator.isUnclaimed(isLand)) {
             buildIsLand(isLand)
             SkyOperator.addOwener(isLand, player)
+            SkyOperator.playerGetOver(player)
             SkyOperator.tpIsLand(player, isLand)
         } else {
             player.sendMessage("岛屿 $isLand 已经有人领过了，主人是${SkyOperator.getOwnersList(isLand)}")
@@ -56,12 +56,12 @@ class SkyCommand : CommandExecutor {
 
     private fun onHelp(player: Player): Boolean {
         val sb = StringBuffer()
-        HelpMassage.values.forEach { sb.append(it).append("\n") }
+        helpMassage.values.forEach { sb.append(it).append("\n") }
         player.sendMessage("帮助：/s <命令>\n$sb")
         return true
     }
 
-    fun onS(p0: Player, p3: Array<out String>): Boolean {
+    private fun onS(p0: Player): Boolean {
         val isLand: IsLand = try {
             SQLiteer.getPlayerIndex(p0.uniqueId.toString())
         } catch (e: RuntimeException) {

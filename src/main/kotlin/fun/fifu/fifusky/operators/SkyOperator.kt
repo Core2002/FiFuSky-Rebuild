@@ -183,7 +183,7 @@ object SkyOperator {
 
     /**
      * 获取岛屿的主人列表
-     * @param 目标岛屿
+     * @param isLand 目标岛屿
      * @return 目标岛屿的主人列表
      */
     fun getOwnersList(isLand: IsLand) {
@@ -220,4 +220,10 @@ object SkyOperator {
         val time = System.currentTimeMillis() - Jsoner.getPlayerLastGet(uuid)
         return Pair(time > DateUtils.MILLIS_PER_DAY * 30 * 2, DateUtil.formatBetween(-time))
     }
+
+    /**
+     * 当玩家get岛屿成功后执行该方法
+     * @param player 领取完岛屿的玩家
+     */
+    fun playerGetOver(player: Player) = Jsoner.setPlayerLastGet(player.uniqueId.toString(), System.currentTimeMillis())
 }
