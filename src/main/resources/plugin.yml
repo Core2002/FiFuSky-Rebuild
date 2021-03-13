@@ -5,8 +5,8 @@ author: NekokeCore
 #api-version: 1.16
 commands:
   s:
-    description: "回到自己的岛"
-    usage: /s 回到自己的岛
+    description: "主命令"
+    usage: 命令输入有误！ /s help [命令] 查看帮助
   fs-admin:
     description: "管理员命令"
-    usage: /fs-admin help 查看帮助
+    usage: 命令输入有误！ /fs-admin help [命令] 查看帮助

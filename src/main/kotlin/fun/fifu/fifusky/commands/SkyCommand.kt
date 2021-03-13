@@ -1,5 +1,6 @@
 package `fun`.fifu.fifusky.commands
 
+import `fun`.fifu.fifusky.FiFuSky
 import `fun`.fifu.fifusky.IsLand
 import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.operators.SkyOperator
@@ -13,6 +14,7 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
+import java.util.*
 import kotlin.random.Random
 
 /**
@@ -21,7 +23,10 @@ import kotlin.random.Random
 class SkyCommand : CommandExecutor {
     private val helpMassage = mapOf(
         "help" to "/s help <命令> 查看帮助",
-        "get" to "/s get <SkyLoc> 领取一个岛屿，两个月只能领一次"
+        "get" to "/s get <SkyLoc> 领取一个岛屿，两个月只能领一次",
+        "info" to "/s info 查询当前岛屿信息",
+        "homes" to "/s homes 查询你有权限的岛屿",
+        "go" to "/s go <SkyLoc> 传送到目标岛屿"
     )
 
     override fun onCommand(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): Boolean {
@@ -30,15 +35,66 @@ class SkyCommand : CommandExecutor {
             return true
         }
         if (p3.isNullOrEmpty()) return onS(p0)
-        return when (p3[0]) {
-            "get" -> onGet(p0, p3)
-            "help" -> onHelp(p0, p3)
-            else -> false
+        try {
+            val re = when (p3[0]) {
+                "help" -> onHelp(p0, p3)
+                "get" -> onGet(p0, p3)
+                "info" -> onInfo(p0)
+                "homes" -> onHomes(p0)
+                "go" -> onGo(p0, p3)
+                else -> false
+            }
+            if (!re) onHelp(p0, arrayOf("help", p3[0]))
+        } catch (e: Exception) {
+            onHelp(p0, arrayOf("help", p3[0]))
+            FiFuSky.fs.logger.warning("$p0 的命令 /s ${p3.contentToString()} 导致了一个异常： ${e.localizedMessage}")
+            return false
         }
+        return true
+    }
+
+    private fun onGo(p0: Player, p3: Array<out String>): Boolean {
+        if (p3.size == 1) return false
+        val isLand = Sky.getIsLand(p3[1])
+        if (SkyOperator.isUnclaimed(isLand)) {
+            p0.sendMessage("没有 $isLand 这个岛屿")
+            return true
+        } else {
+            SkyOperator.tpIsLand(p0, isLand)
+        }
+        return true
+    }
+
+    private fun onHomes(p0: Player): Boolean {
+        val isLand = Sky.getIsLand(p0.location.blockX, p0.location.blockZ)
+        val homes = SkyOperator.getHomes(p0)
+        val homeInfo = """
+            ${p0.name} 现在所在的岛屿是 $isLand
+            你拥有的岛屿有：
+            ${homes.first}
+            你加入的岛屿有：
+            ${homes.second}
+        """.trimIndent()
+        p0.sendMessage(homeInfo)
+        return true
+    }
+
+    private fun onInfo(p0: Player): Boolean {
+        val isLand = Sky.getIsLand(p0.location.blockX, p0.location.blockZ)
+        val info = """
+            ${p0.name} 现在所在的岛屿是 $isLand
+            该岛屿的主人有：
+            ${SkyOperator.getOwnersList(isLand)}
+            该岛屿的成员有：
+            ${SkyOperator.getMembersList(isLand)}
+            您在此岛屿 ${if (SkyOperator.havePermission(p0)) "有" else "没有"} 权限
+        """.trimIndent()
+        p0.sendMessage(info)
+        return true
     }
 
     private fun onGet(player: Player, p3: Array<out String>): Boolean {
-        if (p3[1].isEmpty()) player.sendMessage(helpMassage["get"]!!)
+        if (p3.size == 1) return false
         if (!SkyOperator.canGet(player).first) {
             player.sendMessage("每两个月只能领取一次岛，${SkyOperator.canGet(player).second}后可再次领取")
             return true
@@ -57,7 +113,7 @@ class SkyCommand : CommandExecutor {
 
 
     private fun onHelp(player: Player, p3: Array<out String>): Boolean {
-        if (p3.size<2) {
+        if (p3.size == 1) {
             val sb = StringBuffer()
             helpMassage.values.forEach { sb.append(it).append("\n") }
             player.sendMessage("帮助：/s <命令>\n$sb")

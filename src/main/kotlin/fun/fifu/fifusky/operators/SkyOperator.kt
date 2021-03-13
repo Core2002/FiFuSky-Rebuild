@@ -17,6 +17,7 @@ import org.bukkit.block.data.BlockData
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
+import java.lang.StringBuilder
 
 
 object SkyOperator {
@@ -185,12 +186,27 @@ object SkyOperator {
      * @param isLand 目标岛屿
      * @return 目标岛屿的主人列表
      */
-    fun getOwnersList(isLand: IsLand) {
-        val sb = StringBuffer()
+    fun getOwnersList(isLand: IsLand): String {
+        val sb = StringBuilder()
         val owner = SQLiteer.getIsLandData(isLand).Privilege.Owner
         owner.forEach {
-            sb.append(it.LastName).append(" ")
+            sb.append(it.LastName).append(' ')
         }
+        return sb.toString()
+    }
+
+    /**
+     * 获取岛屿的成员列表
+     * @param isLand 目标岛屿
+     * @return 目标岛屿的成员列表
+     */
+    fun getMembersList(isLand: IsLand): String {
+        val sb = StringBuilder()
+        val owner = SQLiteer.getIsLandData(isLand).Privilege.Member
+        owner.forEach {
+            sb.append(it.LastName).append(' ')
+        }
+        return sb.toString()
     }
 
     /**
@@ -226,4 +242,26 @@ object SkyOperator {
      * @param player 领取完岛屿的玩家
      */
     fun playerGetOver(player: Player) = Jsoner.setPlayerLastGet(player.uniqueId.toString(), System.currentTimeMillis())
+
+    /**
+     * 获取玩家的岛屿列表
+     * @param player 要查询的玩家
+     * @return 第一个：玩家所拥有的岛屿    第二个：玩家所加入的岛屿
+     */
+    fun getHomes(player: Player): Pair<String, String> {
+        val sb = StringBuilder()
+        val homes = SQLiteer.getHomes(player.uniqueId.toString())
+        homes.first.forEach {
+            sb.append(it.IsLand).append(' ')
+        }
+        val forOwner: String = sb.toString()
+        sb.clear()
+        homes.second.forEach {
+            sb.append(it.IsLand).append(' ')
+        }
+        val forMember: String = sb.toString()
+        sb.clear()
+        return Pair(forOwner, forMember)
+    }
+
 }

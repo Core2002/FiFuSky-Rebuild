@@ -154,7 +154,7 @@ object SQLiteer {
      * @param playerUUID 玩家UUID
      * @return 玩家IP列表
      */
-    fun getPlayerIp(playerUUID: String): JSONArray {
+    private fun getPlayerIp(playerUUID: String): JSONArray {
 //        val string = String(FileCache.getFileBytes(playersIP))
 //        val dataObj = JSONUtil.parseObj(string)
 //        var ip = JSONArray()
@@ -197,7 +197,7 @@ object SQLiteer {
      * @param playerUUID 玩家UUID
      * @return 玩家名
      */
-    fun getPlayerName(playerUUID: String): String {
+    private fun getPlayerName(playerUUID: String): String {
 //        val string = String(FileCache.getFileBytes(playersName))
 //        val dataObj = JSONUtil.parseObj(string)
 //        if (dataObj != null) {
@@ -247,7 +247,7 @@ object SQLiteer {
      * @param playerUUID 玩家UUID
      * @param playerName 玩家名
      */
-    fun savePlayerName(playerUUID: String, playerName: String) {
+    private fun savePlayerName(playerUUID: String, playerName: String) {
         if (Db.use().findAll(Entity.create(PlayerData).set("UUID", playerUUID)).isEmpty()) {
             Db.use().insert(
                 Entity.create(PlayerData)
@@ -316,8 +316,39 @@ object SQLiteer {
      * 保存区块信息
      * @param chunkData 区块信息
      */
-    fun setChunkData(chunkData: ChunkData){
-        //todo
+    fun setChunkData(chunkData: ChunkData) {
+        if (Db.use().findAll(Entity.create(ChunkData).set("Chunk", chunkData.Chunk)).isEmpty()) {
+            Db.use().insert(
+                Entity.create(ChunkData)
+                    .set("Chunk", chunkData.Chunk)
+                    .set("AllowExplosion", chunkData.AllowExplosion)
+            )
+        } else {
+            Db.use().update(
+                Entity.create()
+                    .set("Chunk", chunkData.Chunk)
+                    .set("AllowExplosion", chunkData.AllowExplosion),
+                Entity.create(ChunkData).set("Chunk", chunkData.Chunk)
+            )
+        }
     }
 
+    /**
+     * 获取玩家的岛屿列表
+     * @param uuid 玩家的UUID
+     * @return 第一个：玩家所拥有的岛屿    第二个：玩家所加入的岛屿
+     */
+    fun getHomes(uuid: String): Pair<ArrayList<IsLandData>, ArrayList<IsLandData>> {
+        val forOwner = ArrayList<IsLandData>()
+        val forMember = ArrayList<IsLandData>()
+        val temp = Db.use().findAll(SkyIsLand)
+        if (temp.isNotEmpty()) {
+            temp.forEach { entity ->
+                val isLandData = getIsLandData(Sky.getIsLand(entity.getStr("SkyLoc")))
+                isLandData.Privilege.Owner.forEach { if (uuid == it.UUID) forOwner.add(isLandData) }
+                isLandData.Privilege.Member.forEach { if (uuid == it.UUID) forMember.add(isLandData) }
+            }
+        }
+        return Pair(forOwner, forMember)
+    }
 }
