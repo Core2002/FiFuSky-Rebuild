@@ -1,6 +1,5 @@
 package `fun`.fifu.fifusky.operators
 
-import SoundPlayer
 import `fun`.fifu.fifusky.FiFuSky
 import `fun`.fifu.fifusky.IsLand
 import `fun`.fifu.fifusky.Sky
@@ -211,7 +210,7 @@ object SkyOperator {
     }
 
     /**
-     * 判断一个文件是否可以领取岛
+     * 判断一个玩家是否可以领取岛
      * @param player 要判断的玩家
      * @return 第一个：是否可以领取岛，第二个：什么时间后可以领取
      */

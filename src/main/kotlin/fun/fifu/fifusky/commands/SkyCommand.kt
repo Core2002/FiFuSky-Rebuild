@@ -6,6 +6,7 @@ import `fun`.fifu.fifusky.operators.SkyOperator
 import `fun`.fifu.fifusky.operators.SkyOperator.buildIsLand
 import `fun`.fifu.fifusky.data.SQLiteer
 import `fun`.fifu.fifusky.data.PlayerData
+import `fun`.fifu.fifusky.operators.SoundPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.command.Command
@@ -19,7 +20,8 @@ import kotlin.random.Random
  */
 class SkyCommand : CommandExecutor {
     private val helpMassage = mapOf(
-        "get" to "/get <SkyLoc> 领取一个岛屿，两个月只能领一次"
+        "help" to "/s help <命令> 查看帮助",
+        "get" to "/s get <SkyLoc> 领取一个岛屿，两个月只能领一次"
     )
 
     override fun onCommand(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): Boolean {
@@ -30,7 +32,7 @@ class SkyCommand : CommandExecutor {
         if (p3.isNullOrEmpty()) return onS(p0)
         return when (p3[0]) {
             "get" -> onGet(p0, p3)
-            "help" -> onHelp(p0)
+            "help" -> onHelp(p0, p3)
             else -> false
         }
     }
@@ -54,10 +56,15 @@ class SkyCommand : CommandExecutor {
     }
 
 
-    private fun onHelp(player: Player): Boolean {
-        val sb = StringBuffer()
-        helpMassage.values.forEach { sb.append(it).append("\n") }
-        player.sendMessage("帮助：/s <命令>\n$sb")
+    private fun onHelp(player: Player, p3: Array<out String>): Boolean {
+        if (p3[1].isEmpty()) {
+            val sb = StringBuffer()
+            helpMassage.values.forEach { sb.append(it).append("\n") }
+            player.sendMessage("帮助：/s <命令>\n$sb")
+            return true
+        } else {
+            helpMassage[p3[1]]?.let { player.sendMessage(it) }
+        }
         return true
     }
 
@@ -78,6 +85,7 @@ class SkyCommand : CommandExecutor {
             iLD.Privilege.Owner.add(PlayerData(p0.uniqueId.toString(), p0.name))
             SQLiteer.saveIslandData(iLD)
             SQLiteer.savePlayerIndex(p0.uniqueId.toString(), temp.toString())
+            SkyOperator.playerGetOver(p0)
             temp
         }
 

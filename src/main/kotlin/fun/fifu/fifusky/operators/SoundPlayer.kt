@@ -1,3 +1,5 @@
+package `fun`.fifu.fifusky.operators
+
 import org.bukkit.Sound
 import org.bukkit.entity.Player
 import java.util.*
