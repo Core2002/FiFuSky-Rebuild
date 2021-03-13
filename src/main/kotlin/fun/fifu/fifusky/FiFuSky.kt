@@ -31,7 +31,7 @@ class FiFuSky : JavaPlugin() {
     override fun onEnable() {
         //注册命令
         Bukkit.getPluginCommand("s")?.setExecutor(SkyCommand())
-        Bukkit.getPluginCommand("build-island")?.setExecutor(AdminCommand())
+        Bukkit.getPluginCommand("fs-admin")?.setExecutor(AdminCommand())
 
         //注册监听器
         server.pluginManager.registerEvents(PlayerListener(), this)

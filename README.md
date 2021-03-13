@@ -4,9 +4,16 @@
 FiFuSky-Rebuild
 对于原先的空岛插件用kotlin进行重构
 
-#### 软件架构
-软件架构说明
+[FiFu服务器官网](https://www.fifu.fun)
 
+#### 软件架构
+采用高版本CraftBukkit核心进行开发
+
+采用Kotlin作为语言
+
+采用Hutool作为工具库
+
+核心性质的数据使用数据库存储，辅助性质的数据库采用json文件存储
 
 #### 安装教程
 
@@ -16,9 +23,9 @@ FiFuSky-Rebuild
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  db.setting必须解压到服务器核心jar包的根目录里，否则无法读取数据库
+2.  服务端把依赖文件放到服务端核心同级目录，然后将其添加进classpath
+3.  参考启动命令（Paper）：java -javaagent:paper-1.16.5-471.jar -cp * io.papermc.paperclip.Paperclip --nogui
 
 #### 参与贡献
 
@@ -26,13 +33,3 @@ FiFuSky-Rebuild
 2.  新建 Feat_xxx 分支
 3.  提交代码
 4.  新建 Pull Request
-
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)

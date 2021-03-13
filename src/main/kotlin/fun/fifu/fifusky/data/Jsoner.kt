@@ -5,8 +5,14 @@ import cn.hutool.json.JSONUtil
 import java.io.File
 
 object Jsoner {
-    private val cache = LFUFileCache(1000, 50, 5000)
-    private val PlayerLastGet = File("plugins/FiFuSky/PlayerLastGet.json")
+    var cache: LFUFileCache = LFUFileCache(1000, 50, 1000)
+    private val PlayerLastGet: File = File("plugins/FiFuSky/PlayerLastGet.json")
+
+    init {
+        val dir = File("plugins/FiFuSky")
+        if (!dir.isDirectory) dir.mkdirs()
+        if (!PlayerLastGet.isFile) PlayerLastGet.writeText("{}")
+    }
 
     /**
      * 获取玩家上次领取岛的时间
@@ -14,8 +20,7 @@ object Jsoner {
      * @return 该玩家上次获取岛屿的时间的时间戳
      */
     fun getPlayerLastGet(uuid: String): Long {
-        if (!PlayerLastGet.isFile) PlayerLastGet.writeText("{}")
-        val obj = JSONUtil.parseObj(cache.getFileBytes(PlayerLastGet).toString())
+        val obj = JSONUtil.parseObj(String(cache.getFileBytes(PlayerLastGet)))
         if (uuid in obj) {
             return obj[uuid].toString().toLong()
         }

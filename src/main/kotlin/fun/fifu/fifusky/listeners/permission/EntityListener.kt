@@ -77,7 +77,7 @@ class EntityListener : Listener {
         ) {
             return
         }
-        if (SkyOperator.havePermission(player)) {
+        if (!SkyOperator.havePermission(player)) {
             player.sendMessage("你没权限")
             event.isCancelled = true
         }

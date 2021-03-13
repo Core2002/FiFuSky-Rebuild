@@ -26,7 +26,8 @@ class FiFuSkyTest {
 //        Thread.sleep(2000L) // 阻塞主线程 2 秒钟来保证 JVM 存活
 
 
-        println(DateUtil.formatBetween(-86480007090L))
+        Jsoner.setPlayerLastGet("53bac3d9-3d06-328d-a96e-009ea28befe0",1615607087680L)
+        println(Jsoner.getPlayerLastGet("53bac3d9-3d06-328d-a96e-009ea28befe0"))
 
     }
 

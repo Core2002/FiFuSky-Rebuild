@@ -217,7 +217,8 @@ object SkyOperator {
     fun canGet(player: Player): Pair<Boolean, String> {
         val uuid = player.uniqueId.toString()
         val time = System.currentTimeMillis() - Jsoner.getPlayerLastGet(uuid)
-        return Pair(time > DateUtils.MILLIS_PER_DAY * 30 * 2, DateUtil.formatBetween(-time))
+        val lgy = DateUtils.MILLIS_PER_DAY * 30 * 2
+        return Pair(time > lgy, DateUtil.formatBetween(lgy - time))
     }
 
     /**

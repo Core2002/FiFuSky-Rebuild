@@ -57,7 +57,7 @@ class SkyCommand : CommandExecutor {
 
 
     private fun onHelp(player: Player, p3: Array<out String>): Boolean {
-        if (p3[1].isEmpty()) {
+        if (p3.size<2) {
             val sb = StringBuffer()
             helpMassage.values.forEach { sb.append(it).append("\n") }
             player.sendMessage("帮助：/s <命令>\n$sb")
