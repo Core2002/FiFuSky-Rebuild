@@ -3,10 +3,10 @@ package `fun`.fifu.fifusky.commands
 import `fun`.fifu.fifusky.FiFuSky
 import `fun`.fifu.fifusky.IsLand
 import `fun`.fifu.fifusky.Sky
+import `fun`.fifu.fifusky.data.PlayerData
+import `fun`.fifu.fifusky.data.SQLiteer
 import `fun`.fifu.fifusky.operators.SkyOperator
 import `fun`.fifu.fifusky.operators.SkyOperator.buildIsLand
-import `fun`.fifu.fifusky.data.SQLiteer
-import `fun`.fifu.fifusky.data.PlayerData
 import `fun`.fifu.fifusky.operators.SoundPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -14,7 +14,6 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
-import java.util.*
 import kotlin.random.Random
 
 /**
@@ -24,9 +23,11 @@ class SkyCommand : CommandExecutor {
     private val helpMassage = mapOf(
         "help" to "/s help <命令> 查看帮助",
         "get" to "/s get <SkyLoc> 领取一个岛屿，两个月只能领一次",
-        "info" to "/s info 查询当前岛屿信息",
+        "info" to "/s info 查询当前岛屿信息，/s info u 使用uuid查看",
         "homes" to "/s homes 查询你有权限的岛屿",
-        "go" to "/s go <SkyLoc> 传送到目标岛屿"
+        "go" to "/s go <SkyLoc> 传送到目标岛屿",
+        "add-member" to "/s add-member <玩家名> 把目标玩家添加到你所在的岛的成员里",
+        "remove-member" to "/s remove-member <玩家名> 把目标玩家从你所在的岛里移除"
     )
 
     override fun onCommand(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): Boolean {
@@ -39,9 +40,11 @@ class SkyCommand : CommandExecutor {
             val re = when (p3[0]) {
                 "help" -> onHelp(p0, p3)
                 "get" -> onGet(p0, p3)
-                "info" -> onInfo(p0)
+                "info" -> onInfo(p0, p3)
                 "homes" -> onHomes(p0)
                 "go" -> onGo(p0, p3)
+                "add-member" -> onAddMember(p0, p3)
+                "remove-member" -> onRemoveMember(p0, p3)
                 else -> false
             }
             if (!re) onHelp(p0, arrayOf("help", p3[0]))
@@ -53,10 +56,65 @@ class SkyCommand : CommandExecutor {
         return true
     }
 
+    private fun onRemoveMember(p0: Player, p3: Array<out String>): Boolean {
+        if (p3.size == 1) return false
+        if (!SkyOperator.isSkyWorld(p0.world)) {
+            p0.sendMessage("你必须在空岛世界才能使用这条命令")
+            return true
+        }
+        val member = Bukkit.getPlayer(p3[1])
+        if (member == null) {
+            p0.sendMessage("玩家 ${p3[1]} 不在线，无法操作")
+            return true
+        }
+        val isLand = Sky.getIsLand(p0.location.blockX, p0.location.blockZ)
+        val memberUuid = member.uniqueId.toString()
+        val isLandData = SQLiteer.getIsLandData(isLand)
+        val playerData = PlayerData(memberUuid, member.name)
+        val mems = isLandData.Privilege.Member
+        if (playerData in mems) {
+            mems.remove(playerData)
+            p0.sendMessage("操作完毕")
+            SQLiteer.saveIslandData(isLandData)
+            return true
+        } else {
+            p0.sendMessage("玩家 ${member.name} 不是岛 $isLand 的成员")
+            return true
+        }
+    }
+
+    private fun onAddMember(p0: Player, p3: Array<out String>): Boolean {
+        if (p3.size == 1) return false
+        if (!SkyOperator.isSkyWorld(p0.world)) {
+            p0.sendMessage("你必须在空岛世界才能使用这条命令")
+            return true
+        }
+        val member = Bukkit.getPlayer(p3[1])
+        if (member == null) {
+            p0.sendMessage("玩家 ${p3[1]} 不在线，无法操作")
+            return true
+        }
+        val isLand = Sky.getIsLand(p0.location.blockX, p0.location.blockZ)
+        val memberUuid = member.uniqueId.toString()
+        val isLandData = SQLiteer.getIsLandData(isLand)
+        val playerData = PlayerData(memberUuid, member.name)
+        val mems = isLandData.Privilege.Member
+        if (playerData in mems) {
+            p0.sendMessage("玩家 ${member.name} 已经是岛 $isLand 的成员")
+            return true
+        } else {
+            mems.add(playerData)
+        }
+        SQLiteer.saveIslandData(isLandData)
+        p0.sendMessage("操作完毕")
+        return true
+    }
+
     private fun onGo(p0: Player, p3: Array<out String>): Boolean {
         if (p3.size == 1) return false
         val isLand = Sky.getIsLand(p3[1])
         if (SkyOperator.isUnclaimed(isLand)) {
+
             p0.sendMessage("没有 $isLand 这个岛屿")
             return true
         } else {
@@ -69,7 +127,7 @@ class SkyCommand : CommandExecutor {
         val isLand = Sky.getIsLand(p0.location.blockX, p0.location.blockZ)
         val homes = SkyOperator.getHomes(p0)
         val homeInfo = """
-            ${p0.name} 现在所在的岛屿是 $isLand
+            ${p0.name} 现在所在的岛屿的SkyLoc是 $isLand
             你拥有的岛屿有：
             ${homes.first}
             你加入的岛屿有：
@@ -79,14 +137,23 @@ class SkyCommand : CommandExecutor {
         return true
     }
 
-    private fun onInfo(p0: Player): Boolean {
+    private fun onInfo(p0: Player, p3: Array<out String>): Boolean {
+        if (!SkyOperator.isSkyWorld(p0.world)) {
+            p0.sendMessage("你必须在空岛世界才能使用这条命令")
+            return true
+        }
+        val u = p3.size > 1 && p3[1] == "u"
         val isLand = Sky.getIsLand(p0.location.blockX, p0.location.blockZ)
         val info = """
-            ${p0.name} 现在所在的岛屿是 $isLand
+            ${p0.name} 现在所在的岛屿的SkyLoc是 $isLand
+            该岛屿的X：${isLand.X}
+            该岛屿的XX：${isLand.XX}
+            该岛屿的Y：${isLand.Y}
+            该岛屿的YY：${isLand.YY}
             该岛屿的主人有：
-            ${SkyOperator.getOwnersList(isLand)}
+            ${SkyOperator.getOwnersList(isLand, u)}
             该岛屿的成员有：
-            ${SkyOperator.getMembersList(isLand)}
+            ${SkyOperator.getMembersList(isLand, u)}
             您在此岛屿 ${if (SkyOperator.havePermission(p0)) "有" else "没有"} 权限
         """.trimIndent()
         p0.sendMessage(info)

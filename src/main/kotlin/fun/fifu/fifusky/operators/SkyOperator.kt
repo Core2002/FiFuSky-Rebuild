@@ -186,11 +186,15 @@ object SkyOperator {
      * @param isLand 目标岛屿
      * @return 目标岛屿的主人列表
      */
-    fun getOwnersList(isLand: IsLand): String {
+    fun getOwnersList(isLand: IsLand, u: Boolean = false): String {
         val sb = StringBuilder()
         val owner = SQLiteer.getIsLandData(isLand).Privilege.Owner
         owner.forEach {
-            sb.append(it.LastName).append(' ')
+            if (u){
+                sb.append(it.UUID).append(' ')
+            }else{
+                sb.append(it.LastName).append(' ')
+            }
         }
         return sb.toString()
     }
@@ -200,11 +204,15 @@ object SkyOperator {
      * @param isLand 目标岛屿
      * @return 目标岛屿的成员列表
      */
-    fun getMembersList(isLand: IsLand): String {
+    fun getMembersList(isLand: IsLand, u: Boolean = false): String {
         val sb = StringBuilder()
         val owner = SQLiteer.getIsLandData(isLand).Privilege.Member
         owner.forEach {
-            sb.append(it.LastName).append(' ')
+            if (u){
+                sb.append(it.UUID).append(' ')
+            }else{
+                sb.append(it.LastName).append(' ')
+            }
         }
         return sb.toString()
     }
