@@ -11,15 +11,15 @@ import `fun`.fifu.fifusky.operators.SoundPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.command.Command
-import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
+import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
 import kotlin.random.Random
 
 /**
  * 玩家命令
  */
-class SkyCommand : CommandExecutor {
+class SkyCommand : TabExecutor {
     private val helpMassage = mapOf(
         "help" to "/s help <命令> 查看帮助",
         "get" to "/s get <SkyLoc> 领取一个岛屿，两个月只能领一次",
@@ -27,8 +27,14 @@ class SkyCommand : CommandExecutor {
         "homes" to "/s homes 查询你有权限的岛屿",
         "go" to "/s go <SkyLoc> 传送到目标岛屿",
         "add-member" to "/s add-member <玩家名> 把目标玩家添加到你所在的岛的成员里",
-        "remove-member" to "/s remove-member <玩家名> 把目标玩家从你所在的岛里移除"
+        "remove-member" to "/s remove-member <玩家名> 把目标玩家从你所在的岛里移除",
+        "renounce" to "/s renounce 放弃你所在的岛屿"
     )
+
+    override fun onTabComplete(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): MutableList<String> {
+        if (p3.size==1) return helpMassage.keys.toMutableList()
+        return mutableListOf()
+    }
 
     override fun onCommand(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): Boolean {
         if (p0 !is Player) {
@@ -39,12 +45,14 @@ class SkyCommand : CommandExecutor {
         try {
             val re = when (p3[0]) {
                 "help" -> onHelp(p0, p3)
+                "?" -> onHelp(p0, p3)
                 "get" -> onGet(p0, p3)
                 "info" -> onInfo(p0, p3)
                 "homes" -> onHomes(p0)
                 "go" -> onGo(p0, p3)
                 "add-member" -> onAddMember(p0, p3)
                 "remove-member" -> onRemoveMember(p0, p3)
+                "renounce" -> onRenounce(p0,p3)
                 else -> false
             }
             if (!re) onHelp(p0, arrayOf("help", p3[0]))
@@ -54,6 +62,10 @@ class SkyCommand : CommandExecutor {
             return false
         }
         return true
+    }
+
+    private fun onRenounce(p0: Player, p3: Array<out String>): Boolean {
+        TODO("放弃你所在的岛屿")
     }
 
     private fun onRemoveMember(p0: Player, p3: Array<out String>): Boolean {
