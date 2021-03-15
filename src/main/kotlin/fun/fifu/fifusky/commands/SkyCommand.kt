@@ -15,11 +15,25 @@ import org.bukkit.command.CommandSender
 import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
 import kotlin.random.Random
+import cn.hutool.cache.CacheUtil
+import java.lang.StringBuilder
+import java.util.*
+
 
 /**
  * 玩家命令
  */
 class SkyCommand : TabExecutor {
+    var lruCache = CacheUtil.newLRUCache<UUID, String>(8)
+
+    val pc = arrayListOf(
+        'a', 'b', 'c', 'd', 'e', 'f', 'g',
+        'h', 'i', 'j', 'k', 'l', 'm', 'n',
+        'o', 'p', 'q', 'r', 's', 't',
+        'u', 'v', 'w', 'x', 'y', 'z',
+        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
+    )
+
     private val helpMassage = mapOf(
         "help" to "/s help <命令> 查看帮助",
         "get" to "/s get <SkyLoc> 领取一个岛屿，两个月只能领一次",
@@ -32,7 +46,7 @@ class SkyCommand : TabExecutor {
     )
 
     override fun onTabComplete(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): MutableList<String> {
-        if (p3.size==1) return helpMassage.keys.toMutableList()
+        if (p3.size == 1) return helpMassage.keys.toMutableList()
         return mutableListOf()
     }
 
@@ -52,7 +66,7 @@ class SkyCommand : TabExecutor {
                 "go" -> onGo(p0, p3)
                 "add-member" -> onAddMember(p0, p3)
                 "remove-member" -> onRemoveMember(p0, p3)
-                "renounce" -> onRenounce(p0,p3)
+                "renounce" -> onRenounce(p0, p3)
                 else -> false
             }
             if (!re) onHelp(p0, arrayOf("help", p3[0]))
@@ -65,7 +79,30 @@ class SkyCommand : TabExecutor {
     }
 
     private fun onRenounce(p0: Player, p3: Array<out String>): Boolean {
-        TODO("放弃你所在的岛屿")
+        val isLand = Sky.getIsLand(p0.location.blockX, p0.location.blockZ)
+        val canGet = SkyOperator.canGet(p0)
+        val islandNum = SkyOperator.getHomes(p0).first.split(' ').size
+        if (canGet.first || islandNum > 1) {
+            if (p3.size == 3 && p3[2] == lruCache[p0.uniqueId]) {
+                SkyOperator.removeOwner(p0, isLand)
+                p0.sendMessage("操作完毕，玩家 ${p0.name} 放弃了岛屿 $isLand ")
+            } else {
+                val captcha = getCAPTCHA()
+                lruCache.put(p0.uniqueId, captcha)
+                p0.sendMessage(
+                    """
+                    注意！操作危险！该操作将放弃的所在的岛！
+                    若要继续，请输入：
+                    /s renounce $captcha
+                    注意！操作危险！该操作将放弃的所在的岛！
+                """.trimIndent()
+                )
+            }
+
+        } else {
+            p0.sendMessage("因为你现在不能领取岛而又没有多余的岛，所以不能放弃岛，下次可以领取岛的时间：${canGet.second}")
+        }
+        return true
     }
 
     private fun onRemoveMember(p0: Player, p3: Array<out String>): Boolean {
@@ -86,7 +123,7 @@ class SkyCommand : TabExecutor {
         val mems = isLandData.Privilege.Member
         if (playerData in mems) {
             mems.remove(playerData)
-            p0.sendMessage("操作完毕")
+            p0.sendMessage("操作完毕，已将成员 ${member.name} 从岛屿 $isLand 移除")
             SQLiteer.saveIslandData(isLandData)
             return true
         } else {
@@ -118,7 +155,7 @@ class SkyCommand : TabExecutor {
             mems.add(playerData)
         }
         SQLiteer.saveIslandData(isLandData)
-        p0.sendMessage("操作完毕")
+        p0.sendMessage("操作完毕，已将成员 ${member.name} 添加到岛屿 $isLand")
         return true
     }
 
@@ -126,7 +163,6 @@ class SkyCommand : TabExecutor {
         if (p3.size == 1) return false
         val isLand = Sky.getIsLand(p3[1])
         if (SkyOperator.isUnclaimed(isLand)) {
-
             p0.sendMessage("没有 $isLand 这个岛屿")
             return true
         } else {
@@ -241,6 +277,18 @@ class SkyCommand : TabExecutor {
         }
         SoundPlayer.playCat(p0)
         return true
+    }
+
+    /**
+     * 获取验证码，范围是a-z 0-9
+     * @return 验证码
+     */
+    fun getCAPTCHA(): String {
+        val sb = StringBuilder()
+        for (x in 1..8) {
+            sb.append(pc.random())
+        }
+        return sb.toString()
     }
 
 }

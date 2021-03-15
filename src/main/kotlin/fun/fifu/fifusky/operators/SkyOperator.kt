@@ -272,4 +272,20 @@ object SkyOperator {
         return Pair(forOwner, forMember)
     }
 
+    /**
+     * 把玩家主人从岛屿移除
+     * @param player 玩家主人
+     * @param isLand 要操作的岛屿
+     */
+    fun removeOwner(player: Player, isLand: IsLand){
+        val uuid = player.uniqueId.toString()
+        val isLandData = SQLiteer.getIsLandData(isLand)
+        val owners = isLandData.Privilege.Owner
+        owners.forEach {
+            if (uuid==it.UUID)
+                owners.remove(it)
+        }
+        SQLiteer.saveIslandData(isLandData)
+    }
+
 }
