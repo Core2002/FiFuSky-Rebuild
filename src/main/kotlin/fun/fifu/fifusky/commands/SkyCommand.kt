@@ -16,6 +16,9 @@ import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
 import kotlin.random.Random
 import cn.hutool.cache.CacheUtil
+import org.bukkit.Chunk
+import org.bukkit.block.Biome
+import org.bukkit.block.BlockFace
 import java.lang.StringBuilder
 import java.util.*
 
@@ -35,19 +38,26 @@ class SkyCommand : TabExecutor {
     )
 
     private val helpMassage = mapOf(
-        "help" to "/s help <命令> 查看帮助",
+        "help" to "/s help [命令] 查看帮助",
         "get" to "/s get <SkyLoc> 领取一个岛屿，两个月只能领一次",
         "info" to "/s info 查询当前岛屿信息，/s info u 使用uuid查看",
         "homes" to "/s homes 查询你有权限的岛屿",
         "go" to "/s go <SkyLoc> 传送到目标岛屿",
         "add-member" to "/s add-member <玩家名> 把目标玩家添加到你所在的岛的成员里",
         "remove-member" to "/s remove-member <玩家名> 把目标玩家从你所在的岛里移除",
-        "renounce" to "/s renounce 放弃你所在的岛屿"
+        "renounce" to "/s renounce 放弃你所在的岛屿",
+        "biome" to "/s biome [生物群系/编号] 修改当前区块的生物群系，不填则是查看"
     )
 
     override fun onTabComplete(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): MutableList<String> {
         if (p3.size == 1) return helpMassage.keys.toMutableList()
-        return mutableListOf()
+        val ml = mutableListOf<String>()
+        return when (p3[0]) {
+            "biome" -> {
+                if (p3.size == 1) ml.clear();Biome.values().forEach { ml.add(it.name) };ml
+            }
+            else -> ml
+        }
     }
 
     override fun onCommand(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): Boolean {
@@ -57,6 +67,10 @@ class SkyCommand : TabExecutor {
         }
         if (p3.isNullOrEmpty()) return onS(p0)
         try {
+            if (!SkyOperator.isSkyWorld(p0.world)) {
+                p0.sendMessage("你必须在空岛世界才能使用这条命令")
+                return true
+            }
             val re = when (p3[0]) {
                 "help" -> onHelp(p0, p3)
                 "?" -> onHelp(p0, p3)
@@ -67,13 +81,46 @@ class SkyCommand : TabExecutor {
                 "add-member" -> onAddMember(p0, p3)
                 "remove-member" -> onRemoveMember(p0, p3)
                 "renounce" -> onRenounce(p0, p3)
+                "biome" -> onBiome(p0, p3)
                 else -> false
             }
             if (!re) onHelp(p0, arrayOf("help", p3[0]))
         } catch (e: Exception) {
             onHelp(p0, arrayOf("help", p3[0]))
             FiFuSky.fs.logger.warning("$p0 的命令 /s ${p3.contentToString()} 导致了一个异常： ${e.localizedMessage}")
-            return false
+            return true
+        }
+        return true
+    }
+
+
+    private fun onBiome(p0: Player, p3: Array<out String>): Boolean {
+        fun work(chunk: Chunk, biome: Biome) {
+            for (i in 0..15) {
+                for (j in 0..255) {
+                    for (k in 0..15) {
+                        chunk.getBlock(i, j, k).biome = biome
+                    }
+                }
+            }
+        }
+
+        if (p3.size == 1) {
+            val sb = StringBuilder().append("可用的生物群系有：\n")
+            Biome.values()
+                .forEachIndexed { index, biome -> sb.append(index).append('：').append(biome.name).append('\n') }
+            sb.append("你脚下的方块的生物群系是：").append(p0.location.block.getRelative(BlockFace.DOWN).biome.name)
+            p0.sendMessage(sb.toString())
+            return true
+        }
+        try {
+            if (p3[1].isInt()) {
+                work(p0.chunk, Biome.values()[p3[1].toInt()])
+            } else {
+                work(p0.chunk, Biome.valueOf(p3[1]))
+            }
+        } catch (e: Exception) {
+            p0.sendMessage("输入有误： ${p3[1]} 不是一个有效的生物群系或编号")
         }
         return true
     }
@@ -107,10 +154,6 @@ class SkyCommand : TabExecutor {
 
     private fun onRemoveMember(p0: Player, p3: Array<out String>): Boolean {
         if (p3.size == 1) return false
-        if (!SkyOperator.isSkyWorld(p0.world)) {
-            p0.sendMessage("你必须在空岛世界才能使用这条命令")
-            return true
-        }
         val member = Bukkit.getPlayer(p3[1])
         if (member == null) {
             p0.sendMessage("玩家 ${p3[1]} 不在线，无法操作")
@@ -134,10 +177,6 @@ class SkyCommand : TabExecutor {
 
     private fun onAddMember(p0: Player, p3: Array<out String>): Boolean {
         if (p3.size == 1) return false
-        if (!SkyOperator.isSkyWorld(p0.world)) {
-            p0.sendMessage("你必须在空岛世界才能使用这条命令")
-            return true
-        }
         val member = Bukkit.getPlayer(p3[1])
         if (member == null) {
             p0.sendMessage("玩家 ${p3[1]} 不在线，无法操作")
@@ -186,10 +225,6 @@ class SkyCommand : TabExecutor {
     }
 
     private fun onInfo(p0: Player, p3: Array<out String>): Boolean {
-        if (!SkyOperator.isSkyWorld(p0.world)) {
-            p0.sendMessage("你必须在空岛世界才能使用这条命令")
-            return true
-        }
         val u = p3.size > 1 && p3[1] == "u"
         val isLand = Sky.getIsLand(p0.location.blockX, p0.location.blockZ)
         val info = """
@@ -289,6 +324,15 @@ class SkyCommand : TabExecutor {
             sb.append(pc.random())
         }
         return sb.toString()
+    }
+
+    fun String.isInt(): Boolean {
+        return try {
+            this.toInt()
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
 }
