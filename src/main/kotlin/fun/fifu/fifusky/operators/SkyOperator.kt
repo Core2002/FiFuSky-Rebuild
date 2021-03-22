@@ -6,14 +6,13 @@ import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.data.Jsoner
 import `fun`.fifu.fifusky.data.PlayerData
 import `fun`.fifu.fifusky.data.SQLiteer
+import `fun`.fifu.fifusky.operators.SkyOperator.setAllowExplosion
 import cn.hutool.core.date.DateUtil
 import org.apache.commons.lang.time.DateUtils
-import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.Material
-import org.bukkit.World
+import org.bukkit.*
 import org.bukkit.attribute.Attribute
 import org.bukkit.block.data.BlockData
+import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
@@ -190,9 +189,9 @@ object SkyOperator {
         val sb = StringBuilder()
         val owner = SQLiteer.getIsLandData(isLand).Privilege.Owner
         owner.forEach {
-            if (u){
+            if (u) {
                 sb.append(it.UUID).append(' ')
-            }else{
+            } else {
                 sb.append(it.LastName).append(' ')
             }
         }
@@ -208,9 +207,9 @@ object SkyOperator {
         val sb = StringBuilder()
         val owner = SQLiteer.getIsLandData(isLand).Privilege.Member
         owner.forEach {
-            if (u){
+            if (u) {
                 sb.append(it.UUID).append(' ')
-            }else{
+            } else {
                 sb.append(it.LastName).append(' ')
             }
         }
@@ -277,15 +276,56 @@ object SkyOperator {
      * @param player 玩家主人
      * @param isLand 要操作的岛屿
      */
-    fun removeOwner(player: Player, isLand: IsLand){
+    fun removeOwner(player: Player, isLand: IsLand) {
         val uuid = player.uniqueId.toString()
         val isLandData = SQLiteer.getIsLandData(isLand)
         val owners = isLandData.Privilege.Owner
         owners.forEach {
-            if (uuid==it.UUID)
+            if (uuid == it.UUID)
                 owners.remove(it)
         }
         SQLiteer.saveIslandData(isLandData)
     }
+
+    /**
+     * 判断玩家是否拥有岛屿
+     * @param isLand 要检测的岛屿
+     * @return 玩家是否是岛屿的所有者
+     */
+    fun Player.OwnerIsland(isLand: IsLand): Boolean {
+        val isLandData = SQLiteer.getIsLandData(isLand)
+        isLandData.Privilege.Owner.forEach {
+            if (this.uniqueId.toString() == it.UUID) return true
+        }
+        return false
+    }
+
+    /**
+     * 获取实体当前所在的岛屿
+     * @return 当前实体所在的岛屿
+     */
+    fun Entity.currentIsland(): IsLand = Sky.getIsLand(this.location.blockX, this.location.blockZ)
+
+    /**
+     * 获取区块的允许爆炸属性
+     * @return 是否允许爆炸
+     */
+    fun Chunk.getAllowExplosion() = SQLiteer.getChunkData(this.toChunkLoc()).AllowExplosion
+
+    /**
+     * 更改区块的允许爆炸属性
+     * @param switch 是否允许爆炸
+     */
+    fun Chunk.setAllowExplosion(switch: Boolean) {
+        val chunkData = SQLiteer.getChunkData(this.toChunkLoc())
+        chunkData.AllowExplosion = switch
+        SQLiteer.saveChunkData(chunkData)
+    }
+
+    /**
+     * 将该区块转换成ChunkLoc
+     * @return 该区块的ChunkLoc
+     */
+    fun Chunk.toChunkLoc() = "[${this.x},${this.z}]"
 
 }

@@ -6,7 +6,12 @@ import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.data.PlayerData
 import `fun`.fifu.fifusky.data.SQLiteer
 import `fun`.fifu.fifusky.operators.SkyOperator
+import `fun`.fifu.fifusky.operators.SkyOperator.currentIsland
+import `fun`.fifu.fifusky.operators.SkyOperator.OwnerIsland
 import `fun`.fifu.fifusky.operators.SkyOperator.buildIsLand
+import `fun`.fifu.fifusky.operators.SkyOperator.getAllowExplosion
+import `fun`.fifu.fifusky.operators.SkyOperator.setAllowExplosion
+import `fun`.fifu.fifusky.operators.SkyOperator.toChunkLoc
 import `fun`.fifu.fifusky.operators.SoundPlayer
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -46,7 +51,8 @@ class SkyCommand : TabExecutor {
         "add-member" to "/s add-member <玩家名> 把目标玩家添加到你所在的岛的成员里",
         "remove-member" to "/s remove-member <玩家名> 把目标玩家从你所在的岛里移除",
         "renounce" to "/s renounce 放弃你所在的岛屿",
-        "biome" to "/s biome [生物群系/编号] 修改当前区块的生物群系，不填则是查看"
+        "biome" to "/s biome [生物群系/编号] 修改当前区块的生物群系，不填则是查看",
+        "chunk" to "例：/s chunk AllowExplosion <on/off> 来修改区块可爆炸属性，其他以此类推"
     )
 
     override fun onTabComplete(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): MutableList<String> {
@@ -54,7 +60,12 @@ class SkyCommand : TabExecutor {
         val ml = mutableListOf<String>()
         return when (p3[0]) {
             "biome" -> {
-                if (p3.size == 1) ml.clear();Biome.values().forEach { ml.add(it.name) };ml
+                if (p3.size == 1) Biome.values().forEach { ml.add(it.name) };ml
+            }
+            "chunk" -> {
+                if (p3.size == 2) ml.add("AllowExplosion")
+                if (p3.size == 3) ml.add("on");ml.add("off")
+                ml
             }
             else -> ml
         }
@@ -82,6 +93,7 @@ class SkyCommand : TabExecutor {
                 "remove-member" -> onRemoveMember(p0, p3)
                 "renounce" -> onRenounce(p0, p3)
                 "biome" -> onBiome(p0, p3)
+                "chunk" -> onChunk(p0, p3)
                 else -> false
             }
             if (!re) onHelp(p0, arrayOf("help", p3[0]))
@@ -93,18 +105,36 @@ class SkyCommand : TabExecutor {
         return true
     }
 
+    private fun onChunk(p0: Player, p3: Array<out String>): Boolean {
+        if (p3.size < 3) return false
+        if (!p0.OwnerIsland(p0.currentIsland())) {
+            p0.sendMessage("你不是该岛屿的所有者，无权操作")
+            return false
+        }
+        if (p3[1] == "AllowExplosion") {
+            when (p3[2]) {
+                "on" -> p0.chunk.setAllowExplosion(true)
+                "off" -> p0.chunk.setAllowExplosion(false)
+                else -> p0.sendMessage(
+                    """
+                    当前所在区块是 ${p0.chunk.toChunkLoc()} 
+                    该区块 ${if (p0.chunk.getAllowExplosion()) "允许" else "不允许"} 爆炸
+                """.trimIndent()
+                )
+            }
+        }
+        return true
+    }
+
 
     private fun onBiome(p0: Player, p3: Array<out String>): Boolean {
         fun work(chunk: Chunk, biome: Biome) {
-            for (i in 0..15) {
-                for (j in 0..255) {
-                    for (k in 0..15) {
-                        chunk.getBlock(i, j, k).biome = biome
-                    }
-                }
-            }
+            for (x in 0..15) for (y in 0..255) for (z in 0..15) chunk.getBlock(x, y, z).biome = biome
         }
-
+        if (!p0.OwnerIsland(p0.currentIsland())) {
+            p0.sendMessage("你不是该岛屿的所有者，无权操作")
+            return false
+        }
         if (p3.size == 1) {
             val sb = StringBuilder().append("可用的生物群系有：\n")
             Biome.values()
@@ -126,7 +156,11 @@ class SkyCommand : TabExecutor {
     }
 
     private fun onRenounce(p0: Player, p3: Array<out String>): Boolean {
-        val isLand = Sky.getIsLand(p0.location.blockX, p0.location.blockZ)
+        val isLand = p0.currentIsland()
+        if (!p0.OwnerIsland(isLand)) {
+            p0.sendMessage("你不是该岛屿的所有者，无权操作")
+            return false
+        }
         val canGet = SkyOperator.canGet(p0)
         val islandNum = SkyOperator.getHomes(p0).first.split(' ').size
         if (canGet.first || islandNum > 1) {
@@ -159,7 +193,11 @@ class SkyCommand : TabExecutor {
             p0.sendMessage("玩家 ${p3[1]} 不在线，无法操作")
             return true
         }
-        val isLand = Sky.getIsLand(p0.location.blockX, p0.location.blockZ)
+        val isLand = p0.currentIsland()
+        if (!p0.OwnerIsland(isLand)) {
+            p0.sendMessage("你不是该岛屿的所有者，无权操作")
+            return false
+        }
         val memberUuid = member.uniqueId.toString()
         val isLandData = SQLiteer.getIsLandData(isLand)
         val playerData = PlayerData(memberUuid, member.name)
@@ -182,7 +220,11 @@ class SkyCommand : TabExecutor {
             p0.sendMessage("玩家 ${p3[1]} 不在线，无法操作")
             return true
         }
-        val isLand = Sky.getIsLand(p0.location.blockX, p0.location.blockZ)
+        val isLand = p0.currentIsland()
+        if (!p0.OwnerIsland(isLand)) {
+            p0.sendMessage("你不是该岛屿的所有者，无权操作")
+            return false
+        }
         val memberUuid = member.uniqueId.toString()
         val isLandData = SQLiteer.getIsLandData(isLand)
         val playerData = PlayerData(memberUuid, member.name)
@@ -334,5 +376,6 @@ class SkyCommand : TabExecutor {
             false
         }
     }
+
 
 }

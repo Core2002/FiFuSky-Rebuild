@@ -316,7 +316,7 @@ object SQLiteer {
      * 保存区块信息
      * @param chunkData 区块信息
      */
-    fun setChunkData(chunkData: ChunkData) {
+    fun saveChunkData(chunkData: ChunkData) {
         if (Db.use().findAll(Entity.create(ChunkData).set("Chunk", chunkData.Chunk)).isEmpty()) {
             Db.use().insert(
                 Entity.create(ChunkData)
