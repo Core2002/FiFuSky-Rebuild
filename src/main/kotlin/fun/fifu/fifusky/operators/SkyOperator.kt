@@ -6,17 +6,16 @@ import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.data.Jsoner
 import `fun`.fifu.fifusky.data.PlayerData
 import `fun`.fifu.fifusky.data.SQLiteer
-import `fun`.fifu.fifusky.operators.SkyOperator.setAllowExplosion
 import cn.hutool.core.date.DateUtil
 import org.apache.commons.lang.time.DateUtils
 import org.bukkit.*
 import org.bukkit.attribute.Attribute
-import org.bukkit.block.data.BlockData
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import java.lang.StringBuilder
+import org.bukkit.Bukkit
 
 
 object SkyOperator {
@@ -47,9 +46,120 @@ object SkyOperator {
         val t = System.currentTimeMillis()
         //准备工作
         val ic = Sky.getIsLandCenter(isLand)
-        val world = Bukkit.getWorld("world")
-        world?.getBlockAt(ic.first, 64, ic.second)?.setType(Material.BEDROCK, true)
+        val world = Bukkit.getWorld(Sky.WORLD)
 
+        //原点偏移
+        val xx = -3
+        val yy = -4
+        val zz = -1
+        //顶点1
+        val x1 = 508
+        val y1 = 60
+        val z1 = 510
+        //顶点2
+        val x2 = 515
+        val y2 = 69
+        val z2 = 516
+        //目标原点
+        val xxx = isLand.X + Sky.SIDE / 2 + xx.toDouble()
+        val yyy = 64 + yy.toDouble()
+        val zzz = isLand.Y + Sky.SIDE / 2 + zz.toDouble()
+        //生成执行命令
+        val command = "clone $x1 $y1 $z1 $x2 $y2 $z2 ${xxx.toInt()} ${yyy.toInt()} ${zzz.toInt()}"
+        //自动加载区块
+        FiFuSky.fs.logger.info(
+            "chunk.load:" + world!!.getChunkAt(Location(world, xxx, yyy, zzz))
+                .load(true)
+        )
+        FiFuSky.fs.logger.info(
+            "chunk.load:" + world.getChunkAt(
+                Location(
+                    world, (xxx + 16), yyy,
+                    zzz
+                )
+            ).load(true)
+        )
+        FiFuSky.fs.logger.info(
+            "chunk.load:" + world.getChunkAt(
+                Location(
+                    world, (xxx - 16), yyy,
+                    zzz
+                )
+            ).load(true)
+        )
+        FiFuSky.fs.logger.info(
+            "chunk.load:" + world.getChunkAt(
+                Location(
+                    world, xxx, yyy,
+                    (zzz + 16)
+                )
+            ).load(true)
+        )
+        FiFuSky.fs.logger.info(
+            "chunk.load:" + world.getChunkAt(
+                Location(
+                    world, xxx, yyy,
+                    (zzz - 16)
+                )
+            ).load(true)
+        )
+        FiFuSky.fs.logger.info(
+            "chunk.load:" + world.getChunkAt(
+                Location(
+                    world, (xxx + 16), yyy,
+                    (zzz + 16)
+                )
+            ).load(true)
+        )
+        FiFuSky.fs.logger.info(
+            "chunk.load:" + world.getChunkAt(
+                Location(
+                    world, (xxx - 16), yyy,
+                    (zzz - 16)
+                )
+            ).load(true)
+        )
+        FiFuSky.fs.logger.info(
+            "chunk.load:" + world.getChunkAt(
+                Location(
+                    world, (xxx + 16), yyy,
+                    (zzz + 16)
+                )
+            ).load(true)
+        )
+        FiFuSky.fs.logger.info(
+            "chunk.load:" + world.getChunkAt(
+                Location(
+                    world, (xxx - 16), yyy,
+                    (zzz - 16)
+                )
+            ).load(true)
+        )
+
+        FiFuSky.fs.logger.info("chunk0.load:" + world.getChunkAt(Location(world, 511.0, 64.0, 511.0)).load(true))
+        FiFuSky.fs.logger.info("chunk0.load:" + world.getChunkAt(Location(world, 511.0 + 16, 64.0, 511.0)).load(true))
+        FiFuSky.fs.logger.info("chunk0.load:" + world.getChunkAt(Location(world, 511.0 - 16, 64.0, 511.0)).load(true))
+        FiFuSky.fs.logger.info("chunk0.load:" + world.getChunkAt(Location(world, 511.0, 64.0, 511.0 + 16)).load(true))
+        FiFuSky.fs.logger.info("chunk0.load:" + world.getChunkAt(Location(world, 511.0, 64.0, 511.0 - 16)).load(true))
+        FiFuSky.fs.logger.info(
+            "chunk0.load:" + world.getChunkAt(Location(world, 511.0 + 16, 64.0, 511.0 + 16)).load(true)
+        )
+        FiFuSky.fs.logger.info(
+            "chunk0.load:" + world.getChunkAt(Location(world, 511.0 - 16, 64.0, 511.0 - 16)).load(true)
+        )
+        FiFuSky.fs.logger.info(
+            "chunk0.load:" + world.getChunkAt(Location(world, 511.0 + 16, 64.0, 511.0 + 16)).load(true)
+        )
+        FiFuSky.fs.logger.info(
+            "chunk0.load:" + world.getChunkAt(Location(world, 511.0 - 16, 64.0, 511.0 - 16)).load(true)
+        )
+        //开始拷贝初始空岛
+        Bukkit.getScheduler().runTask(FiFuSky.fs, Runnable {
+            FiFuSky.fs.logger.info("开始拷贝初始空岛:$command")
+            Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command)
+            FiFuSky.fs.logger.info("复制完毕！$isLand 耗时 ${System.currentTimeMillis() - t} ms。")
+        })
+/*
         //上界
         val sj = Triple(3, 82, -114)
         //下界
@@ -78,8 +188,9 @@ object SkyOperator {
                 mb.second + t.third
             )!!.blockData = b
         }
-
-        FiFuSky.fs.logger.info("复制完毕！$isLand 耗时 ${System.currentTimeMillis() - t} ms。")
+*/
+        world.getBlockAt(ic.first, 64, ic.second).setType(Material.BEDROCK, true)
+        FiFuSky.fs.logger.info("调度完毕！")
     }
 
 
@@ -292,7 +403,7 @@ object SkyOperator {
      * @param isLand 要检测的岛屿
      * @return 玩家是否是岛屿的所有者
      */
-    fun Player.OwnerIsland(isLand: IsLand): Boolean {
+    fun Player.isOwnerIsland(isLand: IsLand): Boolean {
         val isLandData = SQLiteer.getIsLandData(isLand)
         isLandData.Privilege.Owner.forEach {
             if (this.uniqueId.toString() == it.UUID) return true

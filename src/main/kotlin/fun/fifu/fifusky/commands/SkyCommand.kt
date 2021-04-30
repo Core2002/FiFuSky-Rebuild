@@ -7,7 +7,7 @@ import `fun`.fifu.fifusky.data.PlayerData
 import `fun`.fifu.fifusky.data.SQLiteer
 import `fun`.fifu.fifusky.operators.SkyOperator
 import `fun`.fifu.fifusky.operators.SkyOperator.currentIsland
-import `fun`.fifu.fifusky.operators.SkyOperator.OwnerIsland
+import `fun`.fifu.fifusky.operators.SkyOperator.isOwnerIsland
 import `fun`.fifu.fifusky.operators.SkyOperator.buildIsLand
 import `fun`.fifu.fifusky.operators.SkyOperator.getAllowExplosion
 import `fun`.fifu.fifusky.operators.SkyOperator.setAllowExplosion
@@ -107,7 +107,7 @@ class SkyCommand : TabExecutor {
 
     private fun onChunk(p0: Player, p3: Array<out String>): Boolean {
         if (p3.size < 3) return false
-        if (!p0.OwnerIsland(p0.currentIsland())) {
+        if (!p0.isOwnerIsland(p0.currentIsland())) {
             p0.sendMessage("你不是该岛屿的所有者，无权操作")
             return false
         }
@@ -131,7 +131,7 @@ class SkyCommand : TabExecutor {
         fun work(chunk: Chunk, biome: Biome) {
             for (x in 0..15) for (y in 0..255) for (z in 0..15) chunk.getBlock(x, y, z).biome = biome
         }
-        if (!p0.OwnerIsland(p0.currentIsland())) {
+        if (!p0.isOwnerIsland(p0.currentIsland())) {
             p0.sendMessage("你不是该岛屿的所有者，无权操作")
             return false
         }
@@ -144,11 +144,13 @@ class SkyCommand : TabExecutor {
             return true
         }
         try {
-            if (p3[1].isInt()) {
-                work(p0.chunk, Biome.values()[p3[1].toInt()])
+            val biome = if (p3[1].isInt()) {
+                Biome.values()[p3[1].toInt()]
             } else {
-                work(p0.chunk, Biome.valueOf(p3[1]))
+                Biome.valueOf(p3[1])
             }
+            work(p0.chunk, biome)
+            p0.sendMessage("你已成功将区块 ${p0.chunk.toChunkLoc()} 的生物群系改为 ${biome.name}")
         } catch (e: Exception) {
             p0.sendMessage("输入有误： ${p3[1]} 不是一个有效的生物群系或编号")
         }
@@ -157,13 +159,14 @@ class SkyCommand : TabExecutor {
 
     private fun onRenounce(p0: Player, p3: Array<out String>): Boolean {
         val isLand = p0.currentIsland()
-        if (!p0.OwnerIsland(isLand)) {
+        if (!p0.isOwnerIsland(isLand)) {
             p0.sendMessage("你不是该岛屿的所有者，无权操作")
             return false
         }
         val canGet = SkyOperator.canGet(p0)
         val islandNum = SkyOperator.getHomes(p0).first.split(' ').size
         if (canGet.first || islandNum > 1) {
+            println("Debug: ${lruCache[p0.uniqueId]} ; ${p3.size}")
             if (p3.size == 3 && p3[2] == lruCache[p0.uniqueId]) {
                 SkyOperator.removeOwner(p0, isLand)
                 p0.sendMessage("操作完毕，玩家 ${p0.name} 放弃了岛屿 $isLand ")
@@ -194,7 +197,7 @@ class SkyCommand : TabExecutor {
             return true
         }
         val isLand = p0.currentIsland()
-        if (!p0.OwnerIsland(isLand)) {
+        if (!p0.isOwnerIsland(isLand)) {
             p0.sendMessage("你不是该岛屿的所有者，无权操作")
             return false
         }
@@ -221,7 +224,7 @@ class SkyCommand : TabExecutor {
             return true
         }
         val isLand = p0.currentIsland()
-        if (!p0.OwnerIsland(isLand)) {
+        if (!p0.isOwnerIsland(isLand)) {
             p0.sendMessage("你不是该岛屿的所有者，无权操作")
             return false
         }
