@@ -11,6 +11,7 @@ class PlayerListener :Listener{
     @EventHandler
     fun onPlayerJoin(event:PlayerJoinEvent){
         SQLiteer.savePlayerIp(event.player.uniqueId.toString(),event.player.address.hostName)
+        SQLiteer.savePlayerName(event.player.uniqueId.toString(),event.player.name)
         SoundPlayer.playCat(event.player)
     }
 }

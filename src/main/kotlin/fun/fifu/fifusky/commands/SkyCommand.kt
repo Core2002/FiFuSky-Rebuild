@@ -32,7 +32,7 @@ import java.util.*
  * 玩家命令
  */
 class SkyCommand : TabExecutor {
-    var lruCache = CacheUtil.newLRUCache<UUID, String>(8)
+    val lruCache = CacheUtil.newLRUCache<UUID, String>(8 * 1000)
 
     val pc = arrayListOf(
         'a', 'b', 'c', 'd', 'e', 'f', 'g',
@@ -113,8 +113,14 @@ class SkyCommand : TabExecutor {
         }
         if (p3[1] == "AllowExplosion") {
             when (p3[2]) {
-                "on" -> p0.chunk.setAllowExplosion(true)
-                "off" -> p0.chunk.setAllowExplosion(false)
+                "on" -> {
+                    p0.chunk.setAllowExplosion(true)
+                    p0.sendMessage("区块 ${p0.chunk.toChunkLoc()} ${if (p0.chunk.getAllowExplosion()) "允许" else "不允许"} 爆炸")
+                }
+                "off" -> {
+                    p0.chunk.setAllowExplosion(false)
+                    p0.sendMessage("区块 ${p0.chunk.toChunkLoc()} ${if (p0.chunk.getAllowExplosion()) "允许" else "不允许"} 爆炸")
+                }
                 else -> p0.sendMessage(
                     """
                     当前所在区块是 ${p0.chunk.toChunkLoc()} 
@@ -166,8 +172,7 @@ class SkyCommand : TabExecutor {
         val canGet = SkyOperator.canGet(p0)
         val islandNum = SkyOperator.getHomes(p0).first.split(' ').size
         if (canGet.first || islandNum > 1) {
-            println("Debug: ${lruCache[p0.uniqueId]} ; ${p3.size}")
-            if (p3.size == 3 && p3[2] == lruCache[p0.uniqueId]) {
+            if (p3.size == 2 && p3[1] == lruCache[p0.uniqueId]) {
                 SkyOperator.removeOwner(p0, isLand)
                 p0.sendMessage("操作完毕，玩家 ${p0.name} 放弃了岛屿 $isLand ")
             } else {
@@ -177,8 +182,8 @@ class SkyCommand : TabExecutor {
                     """
                     注意！操作危险！该操作将放弃的所在的岛！
                     若要继续，请输入：
-                    /s renounce $captcha
-                    注意！操作危险！该操作将放弃的所在的岛！
+                    /s renounce ${lruCache[p0.uniqueId]}
+                    注意！操作危险！该操作将放弃你所在的岛！
                 """.trimIndent()
                 )
             }
@@ -341,17 +346,19 @@ class SkyCommand : TabExecutor {
         }
 
         // 如果玩家现在在主城，就回自己岛，不在主城就回主城
-        if (Sky.isInIsLand(p0.location.blockX, p0.location.blockZ, Sky.getIsLand("(0,0)"))) {
+        if (Sky.isInIsLand(p0.location.blockX, p0.location.blockZ, Sky.SPAWN)) {
             p0.sendMessage("欢迎回家")
             SkyOperator.tpIsLand(p0, isLand)
         } else {
             p0.sendMessage("欢迎回到主城")
             p0.teleport(
                 Location(
-                    Bukkit.getWorld("world"),
-                    8.0,
-                    4.0,
-                    8.0
+                    Bukkit.getWorld(Sky.WORLD),
+                    359.0,
+                    109.0,
+                    295.0,
+                    180f,
+                    0f
                 )
             )
         }

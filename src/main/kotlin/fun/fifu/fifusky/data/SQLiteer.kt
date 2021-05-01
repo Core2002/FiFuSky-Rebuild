@@ -197,7 +197,7 @@ object SQLiteer {
      * @param playerUUID 玩家UUID
      * @return 玩家名
      */
-    private fun getPlayerName(playerUUID: String): String {
+    fun getPlayerName(playerUUID: String): String {
 //        val string = String(FileCache.getFileBytes(playersName))
 //        val dataObj = JSONUtil.parseObj(string)
 //        if (dataObj != null) {
@@ -247,7 +247,7 @@ object SQLiteer {
      * @param playerUUID 玩家UUID
      * @param playerName 玩家名
      */
-    private fun savePlayerName(playerUUID: String, playerName: String) {
+    fun savePlayerName(playerUUID: String, playerName: String) {
         if (Db.use().findAll(Entity.create(PlayerData).set("UUID", playerUUID)).isEmpty()) {
             Db.use().insert(
                 Entity.create(PlayerData)

@@ -157,6 +157,7 @@ object SkyOperator {
         Bukkit.getScheduler().runTask(FiFuSky.fs, Runnable {
             FiFuSky.fs.logger.info("开始拷贝初始空岛:$command")
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command)
+            world.getBlockAt(ic.first, 64, ic.second).setType(Material.BEDROCK, true)
             FiFuSky.fs.logger.info("复制完毕！$isLand 耗时 ${System.currentTimeMillis() - t} ms。")
         })
 /*
@@ -189,7 +190,6 @@ object SkyOperator {
             )!!.blockData = b
         }
 */
-        world.getBlockAt(ic.first, 64, ic.second).setType(Material.BEDROCK, true)
         FiFuSky.fs.logger.info("调度完毕！")
     }
 
@@ -391,10 +391,7 @@ object SkyOperator {
         val uuid = player.uniqueId.toString()
         val isLandData = SQLiteer.getIsLandData(isLand)
         val owners = isLandData.Privilege.Owner
-        owners.forEach {
-            if (uuid == it.UUID)
-                owners.remove(it)
-        }
+        owners.remove(PlayerData(uuid, SQLiteer.getPlayerName(uuid)))
         SQLiteer.saveIslandData(isLandData)
     }
 
