@@ -1,7 +1,8 @@
 package `fun`.fifu.fifusky.listeners.permission
 
 import `fun`.fifu.fifusky.Sky
-import `fun`.fifu.fifusky.operators.SkyOperator
+import `fun`.fifu.fifusky.operators.SkyOperator.havePermission
+import `fun`.fifu.fifusky.operators.SkyOperator.isSkyWorld
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
@@ -21,7 +22,7 @@ class BlockListener : Listener {
      */
     @EventHandler
     fun onBlockBreak(event: BlockBreakEvent) {
-        if (!SkyOperator.havePermission(event.player)) {
+        if (!event.player.havePermission()) {
             event.isCancelled = true
             event.player.sendMessage(str)
         }
@@ -34,7 +35,7 @@ class BlockListener : Listener {
      */
     @EventHandler
     fun onBlockBurn(event: BlockBurnEvent) {
-        if (SkyOperator.isSkyWorld(event.block.location.world)) {
+        if (event.block.location.world.isSkyWorld()) {
             event.isCancelled = true
         }
     }
@@ -49,7 +50,7 @@ class BlockListener : Listener {
         if (event.action == Action.LEFT_CLICK_AIR || event.action == Action.RIGHT_CLICK_AIR || event.action == Action.PHYSICAL) {
             return
         }
-        if (!SkyOperator.havePermission(event.player)) {
+        if (!event.player.havePermission()) {
             event.player.sendMessage(str)
             event.isCancelled = true
         }
@@ -62,7 +63,7 @@ class BlockListener : Listener {
      */
     @EventHandler
     fun onBucketEmpty(event: PlayerBucketEmptyEvent) {
-        if (!SkyOperator.havePermission(event.player)) {
+        if (!event.player.havePermission()) {
             event.player.sendMessage(str)
             event.isCancelled = true
         }
@@ -75,7 +76,7 @@ class BlockListener : Listener {
      */
     @EventHandler
     fun onBucketFill(event: PlayerBucketFillEvent) {
-        if (!SkyOperator.havePermission(event.player)) {
+        if (!event.player.havePermission()) {
             event.player.sendMessage(str)
             event.isCancelled = true
         }
@@ -103,7 +104,7 @@ class BlockListener : Listener {
      */
     @EventHandler
     fun onBlockIgnite(event: BlockIgniteEvent) {
-        if (!SkyOperator.isSkyWorld(event.block.world)) return
+        if (!event.block.world.isSkyWorld()) return
         if (event.cause != BlockIgniteEvent.IgniteCause.FLINT_AND_STEEL) {
             event.isCancelled = true
             return

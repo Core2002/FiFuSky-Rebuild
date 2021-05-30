@@ -2,6 +2,8 @@ package `fun`.fifu.fifusky.listeners.permission
 
 import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.operators.SkyOperator
+import `fun`.fifu.fifusky.operators.SkyOperator.havePermission
+import `fun`.fifu.fifusky.operators.SkyOperator.showDamage
 import org.bukkit.Chunk
 import org.bukkit.entity.*
 import org.bukkit.event.EventHandler
@@ -77,7 +79,7 @@ class EntityListener : Listener {
         ) {
             return
         }
-        if (!SkyOperator.havePermission(player)) {
+        if (!player.havePermission()) {
             player.sendMessage("你没权限")
             event.isCancelled = true
         }
@@ -104,7 +106,7 @@ class EntityListener : Listener {
                 //伤害显示
 //                Helper.showDamage(player, entity as LivingEntity)
 
-                if (entity !is Monster && !SkyOperator.havePermission(player) && !Sky.isInIsLand(
+                if (entity !is Monster && !player.havePermission() && !Sky.isInIsLand(
                         loc.blockX,
                         loc.blockZ,
                         Sky.SPAWN
@@ -116,8 +118,8 @@ class EntityListener : Listener {
             } else if (event.damager is Projectile) {
                 if ((event.damager as Projectile).shooter is Player) {
                     val player = (event.damager as Projectile).shooter as Player?
-                    if (player != null) SkyOperator.showDamage(player, entity)
-                    if (entity !is Monster && player != null && !SkyOperator.havePermission(player) && !Sky.isInIsLand(
+                    if (player != null) entity.showDamage(player)
+                    if (entity !is Monster && player != null && !player.havePermission() && !Sky.isInIsLand(
                             loc.blockX,
                             loc.blockZ,
                             Sky.SPAWN

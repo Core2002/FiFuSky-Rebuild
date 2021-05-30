@@ -1,7 +1,7 @@
 package `fun`.fifu.fifusky.commands
 
 import `fun`.fifu.fifusky.Sky
-import `fun`.fifu.fifusky.operators.SkyOperator.buildIsLand
+import `fun`.fifu.fifusky.operators.SkyOperator.build
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
@@ -26,7 +26,7 @@ class AdminCommand : CommandExecutor {
     }
 
     private fun onBuild(p3: Array<out String>): Boolean {
-        buildIsLand(Sky.getIsLand(p3[1]))
+        Sky.getIsLand(p3[1]).build()
         return true
     }
 }

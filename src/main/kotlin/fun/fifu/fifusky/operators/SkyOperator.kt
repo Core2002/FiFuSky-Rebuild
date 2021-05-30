@@ -22,12 +22,11 @@ object SkyOperator {
 
     /**
      * 把玩家传送至某岛屿
-     * @param player 玩家
      * @param isLand 岛屿
      */
-    fun tpIsLand(player: Player, isLand: IsLand) {
+    fun Player.tpIsLand(isLand: IsLand) {
         val isLandCenter = Sky.getIsLandCenter(isLand)
-        player.teleport(
+        this.teleport(
             Location(
                 Bukkit.getWorld("world"),
                 isLandCenter.first.toDouble(),
@@ -35,17 +34,16 @@ object SkyOperator {
                 isLandCenter.second.toDouble()
             )
         )
-        SoundPlayer.playCat(player)
+        SoundPlayer.playCat(this)
     }
 
     /**
      * 构建一个岛屿，将模板岛屿复制到目标岛屿
-     * @param isLand 要构建的目标岛屿
      */
-    fun buildIsLand(isLand: IsLand) {
+    fun IsLand.build() {
         val t = System.currentTimeMillis()
         //准备工作
-        val ic = Sky.getIsLandCenter(isLand)
+        val ic = Sky.getIsLandCenter(this)
         val world = Bukkit.getWorld(Sky.WORLD)
 
         //原点偏移
@@ -61,9 +59,9 @@ object SkyOperator {
         val y2 = 69
         val z2 = 516
         //目标原点
-        val xxx = isLand.X + Sky.SIDE / 2 + xx.toDouble()
+        val xxx = this.X + Sky.SIDE / 2 + xx.toDouble()
         val yyy = 64 + yy.toDouble()
-        val zzz = isLand.Y + Sky.SIDE / 2 + zz.toDouble()
+        val zzz = this.Y + Sky.SIDE / 2 + zz.toDouble()
         //生成执行命令
         val command = "clone $x1 $y1 $z1 $x2 $y2 $z2 ${xxx.toInt()} ${yyy.toInt()} ${zzz.toInt()}"
         //自动加载区块
@@ -158,7 +156,7 @@ object SkyOperator {
             FiFuSky.fs.logger.info("开始拷贝初始空岛:$command")
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command)
             world.getBlockAt(ic.first, 64, ic.second).setType(Material.BEDROCK, true)
-            FiFuSky.fs.logger.info("复制完毕！$isLand 耗时 ${System.currentTimeMillis() - t} ms。")
+            FiFuSky.fs.logger.info("复制完毕！$this 耗时 ${System.currentTimeMillis() - t} ms。")
         })
 /*
         //上界
@@ -212,14 +210,13 @@ object SkyOperator {
 
     /**
      * 判断玩家当前是否有权限
-     * @param player 要查验权限的玩家
      * @return 是否有权限
      */
-    fun havePermission(player: Player): Boolean {
-        val location = player.location
-        if (!isSkyWorld(location.world))
+    fun Player.havePermission(): Boolean {
+        val location = this.location
+        if (!location.world.isSkyWorld())
             return true
-        val uuid = player.uniqueId.toString()
+        val uuid = this.uniqueId.toString()
 
         val privilege = SQLiteer.getIsLandData(Sky.getIsLand(location.blockX, location.blockZ)).Privilege
         privilege.Owner.forEach {
@@ -236,7 +233,6 @@ object SkyOperator {
 
     /**
      * 查询区块是否允许爆炸
-     * @param chunckLoc 区块坐标
      * @return 该区块是否允许爆炸
      */
     fun canExplosion(chunckLoc: String): Boolean = SQLiteer.getChunkData(chunckLoc).AllowExplosion
@@ -244,21 +240,19 @@ object SkyOperator {
 
     /**
      * 判断世界是否是空岛世界
-     * @param world 待检测的世界
      * @return 世界是否是空岛世界
      */
-    fun isSkyWorld(world: World) = world.name == Sky.WORLD
+    fun World.isSkyWorld() = this.name == Sky.WORLD
 
     /**
      * 显示一个实体的血量给玩家
      * @param player 要显示的玩家
-     * @param livingEntity 有血量的实体
      */
-    fun showDamage(player: Player, livingEntity: LivingEntity) {
+    fun LivingEntity.showDamage(player: Player) {
         object : BukkitRunnable() {
             override fun run() {
-                val i = livingEntity.health.toInt()
-                val j = livingEntity.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value.toInt()
+                val i = this@showDamage.health.toInt()
+                val j = this@showDamage.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value.toInt()
                 var color = "§f"
                 val c = i / 1.0 / j
                 if (c in 0.825..1.0) {
@@ -274,18 +268,17 @@ object SkyOperator {
                 } else if (c < 0.165) {
                     color = "§4"
                 }
-                player.sendTitle("", color + livingEntity.name + "->HP:" + i + "/" + j, 2, 20, 6)
+                player.sendTitle("", color + this@showDamage.name + "->HP:" + i + "/" + j, 2, 20, 6)
             }
         }.runTaskLater(FiFuSky.fs, 1)
     }
 
     /**
      * 检查岛屿是否是无人认领的
-     * @param isLand 瑶检查的岛屿
      * @return 是否无人认领
      */
-    fun isUnclaimed(isLand: IsLand): Boolean {
-        val privilege = SQLiteer.getIsLandData(isLand).Privilege
+    fun IsLand.isUnclaimed(): Boolean {
+        val privilege = SQLiteer.getIsLandData(this).Privilege
         if (privilege.Owner.isNullOrEmpty())
             return true
         return false
@@ -293,12 +286,11 @@ object SkyOperator {
 
     /**
      * 获取岛屿的主人列表
-     * @param isLand 目标岛屿
      * @return 目标岛屿的主人列表
      */
-    fun getOwnersList(isLand: IsLand, u: Boolean = false): String {
+    fun IsLand.getOwnersList(u: Boolean = false): String {
         val sb = StringBuilder()
-        val owner = SQLiteer.getIsLandData(isLand).Privilege.Owner
+        val owner = SQLiteer.getIsLandData(this).Privilege.Owner
         owner.forEach {
             if (u) {
                 sb.append(it.UUID).append(' ')
@@ -311,12 +303,11 @@ object SkyOperator {
 
     /**
      * 获取岛屿的成员列表
-     * @param isLand 目标岛屿
      * @return 目标岛屿的成员列表
      */
-    fun getMembersList(isLand: IsLand, u: Boolean = false): String {
+    fun IsLand.getMembersList(u: Boolean = false): String {
         val sb = StringBuilder()
-        val owner = SQLiteer.getIsLandData(isLand).Privilege.Member
+        val owner = SQLiteer.getIsLandData(this).Privilege.Member
         owner.forEach {
             if (u) {
                 sb.append(it.UUID).append(' ')
@@ -329,12 +320,11 @@ object SkyOperator {
 
     /**
      * 给目标岛屿添加一位主人
-     * @param isLand 目标岛屿
      * @param player 要添加的主人
      */
-    fun addOwener(isLand: IsLand, player: Player) {
+    fun IsLand.addOwner(player: Player) {
         val uuid = player.uniqueId.toString()
-        val isLandData = SQLiteer.getIsLandData(isLand)
+        val isLandData = SQLiteer.getIsLandData(this)
         isLandData.Privilege.Owner.forEach {
             if (uuid == it.UUID)
                 return
@@ -345,11 +335,10 @@ object SkyOperator {
 
     /**
      * 判断一个玩家是否可以领取岛
-     * @param player 要判断的玩家
      * @return 第一个：是否可以领取岛，第二个：什么时间后可以领取
      */
-    fun canGet(player: Player): Pair<Boolean, String> {
-        val uuid = player.uniqueId.toString()
+    fun Player.canGetIsland(): Pair<Boolean, String> {
+        val uuid = this.uniqueId.toString()
         val time = System.currentTimeMillis() - Jsoner.getPlayerLastGet(uuid)
         val lgy = DateUtils.MILLIS_PER_DAY * 30 * 2
         return Pair(time > lgy, DateUtil.formatBetween(lgy - time))
@@ -363,12 +352,11 @@ object SkyOperator {
 
     /**
      * 获取玩家的岛屿列表
-     * @param player 要查询的玩家
      * @return 第一个：玩家所拥有的岛屿    第二个：玩家所加入的岛屿
      */
-    fun getHomes(player: Player): Pair<String, String> {
+    fun Player.getIslandHomes(): Pair<String, String> {
         val sb = StringBuilder()
-        val homes = SQLiteer.getHomes(player.uniqueId.toString())
+        val homes = SQLiteer.getHomes(this.uniqueId.toString())
         homes.first.forEach {
             sb.append(it.IsLand).append(' ')
         }
@@ -385,11 +373,10 @@ object SkyOperator {
     /**
      * 把玩家主人从岛屿移除
      * @param player 玩家主人
-     * @param isLand 要操作的岛屿
      */
-    fun removeOwner(player: Player, isLand: IsLand) {
+    fun IsLand.removeOwner(player: Player) {
         val uuid = player.uniqueId.toString()
-        val isLandData = SQLiteer.getIsLandData(isLand)
+        val isLandData = SQLiteer.getIsLandData(this)
         val owners = isLandData.Privilege.Owner
         owners.remove(PlayerData(uuid, SQLiteer.getPlayerName(uuid)))
         SQLiteer.saveIslandData(isLandData)
@@ -400,7 +387,7 @@ object SkyOperator {
      * @param isLand 要检测的岛屿
      * @return 玩家是否是岛屿的所有者
      */
-    fun Player.isOwnerIsland(isLand: IsLand): Boolean {
+    fun Player.isOwnedIsland(isLand: IsLand): Boolean {
         val isLandData = SQLiteer.getIsLandData(isLand)
         isLandData.Privilege.Owner.forEach {
             if (this.uniqueId.toString() == it.UUID) return true
