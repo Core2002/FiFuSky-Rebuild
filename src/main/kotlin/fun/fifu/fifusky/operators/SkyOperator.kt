@@ -1,4 +1,4 @@
-package `fun`.fifu.fifusky.operators
+package `fun`.fifu. fifusky.operators
 
 import `fun`.fifu.fifusky.FiFuSky
 import `fun`.fifu.fifusky.IsLand
@@ -34,6 +34,7 @@ object SkyOperator {
                 isLandCenter.second.toDouble()
             )
         )
+        this.sendTitle(isLand.toString(), "主人 ${isLand.getOwnersList()}", 2, 20 * 3, 6)
         SoundPlayer.playCat(this)
     }
 
@@ -216,6 +217,9 @@ object SkyOperator {
         val location = this.location
         if (!location.world.isSkyWorld())
             return true
+        if (this.gameMode==GameMode.SPECTATOR)
+            return true
+
         val uuid = this.uniqueId.toString()
 
         val privilege = SQLiteer.getIsLandData(Sky.getIsLand(location.blockX, location.blockZ)).Privilege

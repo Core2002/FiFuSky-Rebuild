@@ -5,6 +5,7 @@ import `fun`.fifu.fifusky.IsLand
 import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.data.PlayerData
 import `fun`.fifu.fifusky.data.SQLiteer
+import `fun`.fifu.fifusky.operators.IslandViewer
 import `fun`.fifu.fifusky.operators.SkyOperator
 import `fun`.fifu.fifusky.operators.SkyOperator.addOwner
 import `fun`.fifu.fifusky.operators.SkyOperator.build
@@ -62,7 +63,8 @@ class SkyCommand : TabExecutor {
         "remove-member" to "/s remove-member <玩家名> 把目标玩家从你所在的岛里移除",
         "renounce" to "/s renounce 放弃你所在的岛屿",
         "biome" to "/s biome [生物群系/编号] 修改当前区块的生物群系，不填则是查看",
-        "chunk" to "例：/s chunk AllowExplosion <on/off> 来修改区块可爆炸属性，其他以此类推"
+        "chunk" to "例：/s chunk AllowExplosion <on/off> 来修改区块可爆炸属性，其他以此类推",
+        "view" to "/s view 参观别人的岛屿"
     )
 
     override fun onTabComplete(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): MutableList<String> {
@@ -104,14 +106,21 @@ class SkyCommand : TabExecutor {
                 "renounce" -> onRenounce(p0, p3)
                 "biome" -> onBiome(p0, p3)
                 "chunk" -> onChunk(p0, p3)
+                "view" -> onView(p0)
                 else -> false
             }
             if (!re) onHelp(p0, arrayOf("help", p3[0]))
         } catch (e: Exception) {
             onHelp(p0, arrayOf("help", p3[0]))
-            FiFuSky.fs.logger.warning("$p0 的命令 /s ${p3.contentToString()} 导致了一个异常： ${e.localizedMessage}")
+            FiFuSky.fs.logger.warning("$p0 的命令 /s ${p3.contentToString()} 导致了一个异常：")
+            e.printStackTrace()
             return true
         }
+        return true
+    }
+
+    private fun onView(p0: Player): Boolean {
+        IslandViewer(p0).startView()
         return true
     }
 

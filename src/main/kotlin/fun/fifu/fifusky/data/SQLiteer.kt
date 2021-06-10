@@ -351,4 +351,17 @@ object SQLiteer {
         }
         return Pair(forOwner, forMember)
     }
+
+    /**
+     * 获得数据库中所有的岛屿
+     * @return 所有的岛屿（可变列表）
+     */
+    fun getAllSkyLoc(): MutableList<IsLand> {
+        val temp = Db.use().findAll(Entity.create(SkyIsLand))
+        val r = mutableListOf<IsLand>()
+        temp.forEach {
+            r.add(Sky.getIsLand(it.getStr("SkyLoc")))
+        }
+        return r
+    }
 }
