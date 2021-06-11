@@ -1,12 +1,12 @@
 package `fun`.fifu.fifusky.data
 
-import `fun`.fifu.fifusky.IsLand
+import `fun`.fifu.fifusky.Island
 
 /**
  * 代表一个岛信息
  * @author NekokeCore
  */
-data class IsLandData(
-    val IsLand: IsLand,
+data class IslandData(
+    val Island: Island,
     val Privilege: PrivilegeData
 )

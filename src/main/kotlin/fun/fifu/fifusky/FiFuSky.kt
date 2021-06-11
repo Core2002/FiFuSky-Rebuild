@@ -3,10 +3,9 @@ package `fun`.fifu.fifusky
 import `fun`.fifu.fifusky.commands.AdminCommand
 import `fun`.fifu.fifusky.commands.SkyCommand
 import `fun`.fifu.fifusky.data.SQLiteer
-import `fun`.fifu.fifusky.listeners.PlayerListener
-import `fun`.fifu.fifusky.listeners.permission.BlockListener
-import `fun`.fifu.fifusky.listeners.permission.EntityListener
+import `fun`.fifu.utils.PackageUtil
 import org.bukkit.Bukkit
+import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 
@@ -22,7 +21,7 @@ class FiFuSky : JavaPlugin() {
 
     override fun onLoad() {
         fs = this
-        if (!File("plugins/FiFuSky").isDirectory){
+        if (!File("plugins/FiFuSky").isDirectory) {
             saveResource("FiFuSky.db", false)
             saveResource("db.setting", false)
         }
@@ -34,11 +33,23 @@ class FiFuSky : JavaPlugin() {
         Bukkit.getPluginCommand("fs-admin")?.setExecutor(AdminCommand())
 
         //注册监听器
-        server.pluginManager.registerEvents(PlayerListener(), this)
-        server.pluginManager.registerEvents(BlockListener(), this)
-        server.pluginManager.registerEvents(EntityListener(), this)
+        PackageUtil.getClassName("fun.fifu.fifusky.listeners")?.forEach {
+            try {
+                val any = Class.forName(it).newInstance()
+                if (any is Listener){
+                    logger.info("扫描 $it")
+                    any.register()
+                }
+            }catch (e:Exception){
+            }
+        }
 
-        logger.info(SQLiteer.getIsLandData(Sky.getIsLand("(0,0)")).toString())
+        logger.info(SQLiteer.getIsLandData(Sky.getIsland("(0,0)")).toString())
         logger.info("FiFu空岛插件已启动！")
+    }
+
+    private fun Listener.register() {
+        server.pluginManager.registerEvents(this, this@FiFuSky)
+        logger.info("监听器 ${this.javaClass.simpleName} 注册完毕")
     }
 }

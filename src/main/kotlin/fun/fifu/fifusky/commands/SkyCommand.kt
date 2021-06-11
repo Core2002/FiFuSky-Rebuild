@@ -1,7 +1,7 @@
 package `fun`.fifu.fifusky.commands
 
 import `fun`.fifu.fifusky.FiFuSky
-import `fun`.fifu.fifusky.IsLand
+import `fun`.fifu.fifusky.Island
 import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.data.PlayerData
 import `fun`.fifu.fifusky.data.SQLiteer
@@ -13,6 +13,7 @@ import `fun`.fifu.fifusky.operators.SkyOperator.currentIsland
 import `fun`.fifu.fifusky.operators.SkyOperator.isOwnedIsland
 import `fun`.fifu.fifusky.operators.SkyOperator.canGetIsland
 import `fun`.fifu.fifusky.operators.SkyOperator.getAllowExplosion
+import `fun`.fifu.fifusky.operators.SkyOperator.getIslandData
 import `fun`.fifu.fifusky.operators.SkyOperator.getIslandHomes
 import `fun`.fifu.fifusky.operators.SkyOperator.getMembersList
 import `fun`.fifu.fifusky.operators.SkyOperator.getOwnersList
@@ -22,8 +23,9 @@ import `fun`.fifu.fifusky.operators.SkyOperator.isUnclaimed
 import `fun`.fifu.fifusky.operators.SkyOperator.removeOwner
 import `fun`.fifu.fifusky.operators.SkyOperator.setAllowExplosion
 import `fun`.fifu.fifusky.operators.SkyOperator.toChunkLoc
-import `fun`.fifu.fifusky.operators.SkyOperator.tpIsLand
+import `fun`.fifu.fifusky.operators.SkyOperator.tpIsland
 import `fun`.fifu.fifusky.operators.SoundPlayer
+import cn.hutool.cache.Cache
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.command.Command
@@ -43,9 +45,9 @@ import java.util.*
  * 玩家命令
  */
 class SkyCommand : TabExecutor {
-    val lruCache = CacheUtil.newLRUCache<UUID, String>(8 * 1000)
+    private val lruCache: Cache<UUID, String> = CacheUtil.newLRUCache(8 * 1000)
 
-    val pc = arrayListOf(
+    private val pc = arrayListOf(
         'a', 'b', 'c', 'd', 'e', 'f', 'g',
         'h', 'i', 'j', 'k', 'l', 'm', 'n',
         'o', 'p', 'q', 'r', 's', 't',
@@ -233,11 +235,10 @@ class SkyCommand : TabExecutor {
             mems.remove(playerData)
             p0.sendMessage("操作完毕，已将成员 ${member.name} 从岛屿 $isLand 移除")
             SQLiteer.saveIslandData(isLandData)
-            return true
         } else {
             p0.sendMessage("玩家 ${member.name} 不是岛 $isLand 的成员")
-            return true
         }
+        return true
     }
 
     private fun onAddMember(p0: Player, p3: Array<out String>): Boolean {
@@ -269,18 +270,18 @@ class SkyCommand : TabExecutor {
 
     private fun onGo(p0: Player, p3: Array<out String>): Boolean {
         if (p3.size == 1) return false
-        val isLand = Sky.getIsLand(p3[1])
+        val isLand = Sky.getIsland(p3[1])
         if (isLand.isUnclaimed()) {
             p0.sendMessage("没有 $isLand 这个岛屿")
             return true
         } else {
-            p0.tpIsLand(isLand)
+            p0.tpIsland(isLand)
         }
         return true
     }
 
     private fun onHomes(p0: Player): Boolean {
-        val isLand = Sky.getIsLand(p0.location.blockX, p0.location.blockZ)
+        val isLand = Sky.getIsland(p0.location.blockX, p0.location.blockZ)
         val homes = p0.getIslandHomes()
         val homeInfo = """
             ${p0.name} 现在所在的岛屿的SkyLoc是 $isLand
@@ -295,7 +296,7 @@ class SkyCommand : TabExecutor {
 
     private fun onInfo(p0: Player, p3: Array<out String>): Boolean {
         val u = p3.size > 1 && p3[1] == "u"
-        val isLand = Sky.getIsLand(p0.location.blockX, p0.location.blockZ)
+        val isLand = Sky.getIsland(p0.location.blockX, p0.location.blockZ)
         val info = """
             ${p0.name} 现在所在的岛屿的SkyLoc是 $isLand
             该岛屿的X：${isLand.X}
@@ -318,12 +319,12 @@ class SkyCommand : TabExecutor {
             player.sendMessage("每两个月只能领取一次岛，${player.canGetIsland().second}后可再次领取")
             return true
         }
-        val isLand = Sky.getIsLand(p3[1])
+        val isLand = Sky.getIsland(p3[1])
         if (isLand.isUnclaimed()) {
             isLand.build()
             isLand.addOwner(player)
-            SkyOperator.playerGetOver(player)
-            player.tpIsLand(isLand)
+            SkyOperator.playerGetOver(player, isLand.getIslandData())
+            player.tpIsland(isLand)
         } else {
             player.sendMessage("岛屿 $isLand 已经有人领过了，主人是${isLand.getOwnersList()}")
         }
@@ -344,30 +345,28 @@ class SkyCommand : TabExecutor {
     }
 
     private fun onS(p0: Player): Boolean {
-        val isLand: IsLand = try {
+        val island: Island = try {
             SQLiteer.getPlayerIndex(p0.uniqueId.toString())
         } catch (e: RuntimeException) {
-            var temp: IsLand
+            var temp: Island
             do {
                 val xx = Random.nextInt(-Sky.MAX_ISLAND * Sky.SIDE, Sky.MAX_ISLAND * Sky.SIDE + 1)
                 val zz = Random.nextInt(-Sky.MAX_ISLAND * Sky.SIDE, Sky.MAX_ISLAND * Sky.SIDE + 1)
-                temp = Sky.getIsLand(xx, zz)
+                temp = Sky.getIsland(xx, zz)
             } while (!SQLiteer.getIsLandData(temp).Privilege.Owner.isNullOrEmpty())
 
             temp.build()
 
             val iLD = SQLiteer.getIsLandData(temp)
             iLD.Privilege.Owner.add(PlayerData(p0.uniqueId.toString(), p0.name))
-            SQLiteer.saveIslandData(iLD)
-            SQLiteer.savePlayerIndex(p0.uniqueId.toString(), temp.toString())
-            SkyOperator.playerGetOver(p0)
+            SkyOperator.playerGetOver(p0, iLD)
             temp
         }
 
         // 如果玩家现在在主城，就回自己岛，不在主城就回主城
-        if (Sky.isInIsLand(p0.location.blockX, p0.location.blockZ, Sky.SPAWN)) {
+        if (Sky.isInIsland(p0.location.blockX, p0.location.blockZ, Sky.SPAWN)) {
             p0.sendMessage("欢迎回家")
-            p0.tpIsLand(isLand)
+            p0.tpIsland(island)
         } else {
             p0.sendMessage("欢迎回到主城")
             p0.teleport(
@@ -389,7 +388,7 @@ class SkyCommand : TabExecutor {
      * 获取验证码，范围是a-z 0-9
      * @return 验证码
      */
-    fun getCAPTCHA(): String {
+    private fun getCAPTCHA(): String {
         val sb = StringBuilder()
         for (x in 1..8) {
             sb.append(pc.random())
@@ -397,7 +396,7 @@ class SkyCommand : TabExecutor {
         return sb.toString()
     }
 
-    fun String.isInt(): Boolean {
+    private fun String.isInt(): Boolean {
         return try {
             this.toInt()
             true

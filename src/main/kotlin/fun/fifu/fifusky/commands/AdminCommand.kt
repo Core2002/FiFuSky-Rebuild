@@ -26,7 +26,7 @@ class AdminCommand : CommandExecutor {
     }
 
     private fun onBuild(p3: Array<out String>): Boolean {
-        Sky.getIsLand(p3[1]).build()
+        Sky.getIsland(p3[1]).build()
         return true
     }
 }

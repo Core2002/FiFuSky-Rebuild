@@ -92,7 +92,7 @@ class BlockListener : Listener {
         if (event.block.world.name != Sky.WORLD) return
         val xx = event.block.location.x.toInt()
         val zz = event.block.location.z.toInt()
-        if (Sky.isInIsLand(xx, zz, Sky.SPAWN)) {
+        if (Sky.isInIsland(xx, zz, Sky.SPAWN)) {
             event.isCancelled = true
         }
     }
@@ -114,7 +114,7 @@ class BlockListener : Listener {
         }
         val xx = event.block.location.x.toInt()
         val zz = event.block.location.z.toInt()
-        if (Sky.isInIsLand(xx, zz, Sky.SPAWN)) {
+        if (Sky.isInIsland(xx, zz, Sky.SPAWN)) {
             event.isCancelled = true
         }
     }

@@ -1,6 +1,6 @@
 package `fun`.fifu.fifusky.data
 
-import `fun`.fifu.fifusky.IsLand
+import `fun`.fifu.fifusky.Island
 import `fun`.fifu.fifusky.Sky
 import cn.hutool.db.Db
 import cn.hutool.db.Entity
@@ -41,22 +41,21 @@ object SQLiteer {
 
     /**
      * 获取指定的岛屿的岛屿信息
-     * @param isLand 岛屿
+     * @param island 岛屿
      * @return 岛屿信息
      */
-    fun getIsLandData(isLand: IsLand): IsLandData {
-        val temp = Db.use().findAll(Entity.create(SkyIsLand).set("SkyLoc", isLand.toString()))
+    fun getIsLandData(island: Island): IslandData {
+        val temp = Db.use().findAll(Entity.create(SkyIsLand).set("SkyLoc", island.toString()))
         return if (temp.isNotEmpty()) {
             val ownerPlayersData = getPlayersData(temp[0].getStr("OwnersList").toString())
             val memberPlayersData = getPlayersData(temp[0].getStr("MembersList").toString())
 
-            val privilegeData = PrivilegeData(isLand, ownerPlayersData, memberPlayersData)
+            val privilegeData = PrivilegeData(island, ownerPlayersData, memberPlayersData)
 
-            IsLandData(isLand, privilegeData)
+            IslandData(island, privilegeData)
         } else {
-            IsLandData(isLand, PrivilegeData(isLand, ArrayList(), ArrayList()))
+            IslandData(island, PrivilegeData(island, ArrayList(), ArrayList()))
         }
-
 
     }
 
@@ -95,7 +94,7 @@ object SQLiteer {
      * @param playerUUID 玩家UUID
      * @return 玩家主岛
      */
-    fun getPlayerIndex(playerUUID: String): IsLand {
+    fun getPlayerIndex(playerUUID: String): Island {
 //        val string = String(FileCache.getFileBytes(playersIndex))
 //        val dataObj = JSONUtil.parseObj(string)
 //
@@ -103,9 +102,9 @@ object SQLiteer {
 
         val temp = Db.use().findAll(Entity.create(PlayerData).set("UUID", playerUUID))
         if (temp.isNotEmpty()) {
-            return Sky.getIsLand(temp[0].getStr("IndexSkyLoc"))
+            return Sky.getIsland(temp[0].getStr("IndexSkyLoc"))
         } else {
-            throw RuntimeException("查询失败  --  $playerUUID")
+            throw RuntimeException("查询玩家的主岛失败  --  $playerUUID")
         }
 
     }
@@ -264,18 +263,18 @@ object SQLiteer {
 
     /**
      * 把IslandData保存到数据库
-     * @param isLandData 岛屿数据
+     * @param islandData 岛屿数据
      */
-    fun saveIslandData(isLandData: IsLandData) {
-        val skyLoc = isLandData.IsLand.toString()
+    fun saveIslandData(islandData: IslandData) {
+        val skyLoc = islandData.Island.toString()
 
         val membersList = JSONUtil.createArray()
         val ownersList = JSONUtil.createArray()
-        isLandData.Privilege.Owner.forEach {
+        islandData.Privilege.Owner.forEach {
             ownersList.add(it.UUID)
             savePlayerName(it.UUID, it.LastName)
         }
-        isLandData.Privilege.Member.forEach {
+        islandData.Privilege.Member.forEach {
             membersList.add(it.UUID)
             savePlayerName(it.UUID, it.LastName)
         }
@@ -338,13 +337,13 @@ object SQLiteer {
      * @param uuid 玩家的UUID
      * @return 第一个：玩家所拥有的岛屿    第二个：玩家所加入的岛屿
      */
-    fun getHomes(uuid: String): Pair<ArrayList<IsLandData>, ArrayList<IsLandData>> {
-        val forOwner = ArrayList<IsLandData>()
-        val forMember = ArrayList<IsLandData>()
+    fun getHomes(uuid: String): Pair<ArrayList<IslandData>, ArrayList<IslandData>> {
+        val forOwner = ArrayList<IslandData>()
+        val forMember = ArrayList<IslandData>()
         val temp = Db.use().findAll(SkyIsLand)
         if (temp.isNotEmpty()) {
             temp.forEach { entity ->
-                val isLandData = getIsLandData(Sky.getIsLand(entity.getStr("SkyLoc")))
+                val isLandData = getIsLandData(Sky.getIsland(entity.getStr("SkyLoc")))
                 isLandData.Privilege.Owner.forEach { if (uuid == it.UUID) forOwner.add(isLandData) }
                 isLandData.Privilege.Member.forEach { if (uuid == it.UUID) forMember.add(isLandData) }
             }
@@ -356,11 +355,11 @@ object SQLiteer {
      * 获得数据库中所有的岛屿
      * @return 所有的岛屿（可变列表）
      */
-    fun getAllSkyLoc(): MutableList<IsLand> {
+    fun getAllSkyLoc(): MutableList<Island> {
         val temp = Db.use().findAll(Entity.create(SkyIsLand))
-        val r = mutableListOf<IsLand>()
+        val r = mutableListOf<Island>()
         temp.forEach {
-            r.add(Sky.getIsLand(it.getStr("SkyLoc")))
+            r.add(Sky.getIsland(it.getStr("SkyLoc")))
         }
         return r
     }

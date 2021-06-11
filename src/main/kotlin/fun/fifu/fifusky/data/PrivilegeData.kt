@@ -1,6 +1,6 @@
 package `fun`.fifu.fifusky.data
 
-import `fun`.fifu.fifusky.IsLand
+import `fun`.fifu.fifusky.Island
 import java.util.*
 
 /**
@@ -8,7 +8,7 @@ import java.util.*
  * @author NekokeCore
  */
 data class PrivilegeData(
-    val Island: IsLand,
+    val island: Island,
     var Owner: ArrayList<PlayerData>,
     var Member: ArrayList<PlayerData>
 )

@@ -1,15 +1,6 @@
+
 import `fun`.fifu.fifusky.Sky
-import `fun`.fifu.fifusky.data.ChunkData
-import `fun`.fifu.fifusky.data.Jsoner
-import `fun`.fifu.fifusky.data.PlayerData
-import `fun`.fifu.fifusky.data.SQLiteer
-import `fun`.fifu.fifusky.operators.SkyOperator.isUnclaimed
-import cn.hutool.core.date.BetweenFormatter
-import cn.hutool.core.date.DateUtil
-import cn.hutool.db.Db
-import cn.hutool.db.Entity
-import cn.hutool.json.JSONUtil
-import java.lang.StringBuilder
+import `fun`.fifu.utils.PackageUtil
 
 class FiFuSkyTest {
 
@@ -23,7 +14,9 @@ class FiFuSkyTest {
 
     fun test() {
         println("OK")
-        println(Sky.getIsLand("(0,0)").isUnclaimed())
+        PackageUtil.getClassName("fun.fifu.fifusky.listeners")?.forEach {
+            println(it)
+        }
 
 
 

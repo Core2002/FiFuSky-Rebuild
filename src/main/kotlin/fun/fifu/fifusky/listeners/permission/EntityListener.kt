@@ -30,7 +30,7 @@ class EntityListener : Listener {
         if (event.location.world.name != Sky.WORLD) return
         val xx = event.location.x.toInt()
         val zz = event.location.z.toInt()
-        if (Sky.isInIsLand(xx, zz, Sky.SPAWN) && event.entity is Monster) {
+        if (Sky.isInIsland(xx, zz, Sky.SPAWN) && event.entity is Monster) {
             event.isCancelled = true
         }
     }
@@ -103,10 +103,7 @@ class EntityListener : Listener {
         if (entity is LivingEntity) {
             if (event.damager is Player) {
                 val player = event.damager as Player
-                //伤害显示
-//                Helper.showDamage(player, entity as LivingEntity)
-
-                if (entity !is Monster && !player.havePermission() && !Sky.isInIsLand(
+                if (entity !is Monster && !player.havePermission() && !Sky.isInIsland(
                         loc.blockX,
                         loc.blockZ,
                         Sky.SPAWN
@@ -119,7 +116,7 @@ class EntityListener : Listener {
                 if ((event.damager as Projectile).shooter is Player) {
                     val player = (event.damager as Projectile).shooter as Player?
                     if (player != null) entity.showDamage(player)
-                    if (entity !is Monster && player != null && !player.havePermission() && !Sky.isInIsLand(
+                    if (entity !is Monster && player != null && !player.havePermission() && !Sky.isInIsland(
                             loc.blockX,
                             loc.blockZ,
                             Sky.SPAWN

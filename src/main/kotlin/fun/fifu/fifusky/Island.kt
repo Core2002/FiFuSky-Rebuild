@@ -11,7 +11,7 @@ package `fun`.fifu.fifusky
  *
  * r代表x，y相等，以此类推
  */
-data class IsLand(
+data class Island(
     val SkyLoc: Pair<Int, Int>,
     val X: Int,
     val XX: Int,
