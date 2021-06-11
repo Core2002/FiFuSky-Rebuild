@@ -66,7 +66,7 @@ class SkyCommand : TabExecutor {
         "renounce" to "/s renounce 放弃你所在的岛屿",
         "biome" to "/s biome [生物群系/编号] 修改当前区块的生物群系，不填则是查看",
         "chunk" to "例：/s chunk AllowExplosion <on/off> 来修改区块可爆炸属性，其他以此类推",
-        "view" to "/s view 参观别人的岛屿"
+        "view" to "/s view [index=0] 参观别人的岛屿,默认起点是index=0"
     )
 
     override fun onTabComplete(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): MutableList<String> {
@@ -108,7 +108,7 @@ class SkyCommand : TabExecutor {
                 "renounce" -> onRenounce(p0, p3)
                 "biome" -> onBiome(p0, p3)
                 "chunk" -> onChunk(p0, p3)
-                "view" -> onView(p0)
+                "view" -> onView(p0, p3)
                 else -> false
             }
             if (!re) onHelp(p0, arrayOf("help", p3[0]))
@@ -121,8 +121,11 @@ class SkyCommand : TabExecutor {
         return true
     }
 
-    private fun onView(p0: Player): Boolean {
-        IslandViewer(p0).startView()
+    private fun onView(p0: Player, p3: Array<out String>): Boolean {
+        if (p3.size == 2)
+            IslandViewer(p0).startView(p3[1].toInt())
+        else
+            IslandViewer(p0).startView()
         return true
     }
 

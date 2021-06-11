@@ -7,7 +7,6 @@ import `fun`.fifu.fifusky.data.IslandData
 import `fun`.fifu.fifusky.data.Jsoner
 import `fun`.fifu.fifusky.data.PlayerData
 import `fun`.fifu.fifusky.data.SQLiteer
-import `fun`.fifu.fifusky.operators.SkyOperator.getMembersList
 import cn.hutool.core.date.DateUtil
 import org.apache.commons.lang.time.DateUtils
 import org.bukkit.*

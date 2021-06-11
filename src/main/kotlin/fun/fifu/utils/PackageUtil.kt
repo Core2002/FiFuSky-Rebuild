@@ -31,7 +31,7 @@ object PackageUtil {
         if (url != null) {
             val type = url.protocol
             if (type == "file") {
-                fileNames = getClassNameByFile(url.path, null, childPackage)
+                fileNames = getClassNameByFile(url.path, childPackage)
             } else if (type == "jar") {
                 fileNames = getClassNameByJar(url.path, childPackage)
             }
@@ -44,18 +44,17 @@ object PackageUtil {
     /**
      * 从项目文件获取某包下所有类
      * @param filePath 文件路径
-     * @param className 类名集合
      * @param childPackage 是否遍历子包
      * @return 类的完整名称
      */
-    private fun getClassNameByFile(filePath: String, className: List<String?>?, childPackage: Boolean): List<String?>? {
-        val myClassName: MutableList<String?> = ArrayList()
+    private fun getClassNameByFile(filePath: String, childPackage: Boolean): List<String> {
+        val myClassName: MutableList<String> = ArrayList()
         val file = File(filePath)
         val childFiles = file.listFiles()
         for (childFile in childFiles) {
             if (childFile.isDirectory) {
                 if (childPackage) {
-                    myClassName.addAll(getClassNameByFile(childFile.path, myClassName, childPackage)!!)
+                    myClassName.addAll(getClassNameByFile(childFile.path, childPackage))
                 }
             } else {
                 var childFilePath = childFile.path
@@ -76,7 +75,7 @@ object PackageUtil {
      * @param childPackage 是否遍历子包
      * @return 类的完整名称
      */
-    fun getClassNameByJar(jarPath: String, childPackage: Boolean): List<String?>? {
+    fun getClassNameByJar(jarPath: String, childPackage: Boolean): List<String?> {
         val myClassName: MutableList<String?> = ArrayList()
         val jarInfo = jarPath.split("!").toTypedArray()
         val jarFilePath = jarInfo[0].substring(jarInfo[0].indexOf("/"))
@@ -121,7 +120,7 @@ object PackageUtil {
      * @param childPackage 是否遍历子包
      * @return 类的完整名称
      */
-    fun getClassNameByJars(urls: Array<URL>?, packagePath: String, childPackage: Boolean): List<String?>? {
+    fun getClassNameByJars(urls: Array<URL>?, packagePath: String, childPackage: Boolean): List<String?> {
         val myClassName: MutableList<String?> = ArrayList()
         if (urls != null) {
             for (i in urls.indices) {
@@ -132,7 +131,7 @@ object PackageUtil {
                     continue
                 }
                 val jarPath = "$urlPath!/$packagePath"
-                myClassName.addAll(getClassNameByJar(jarPath, childPackage)!!)
+                myClassName.addAll(getClassNameByJar(jarPath, childPackage))
             }
         }
         return myClassName

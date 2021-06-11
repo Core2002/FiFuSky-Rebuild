@@ -12,17 +12,22 @@ import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 
 class IslandViewer(private val player: Player) {
-    private val canViewIsland: MutableList<Island> = SQLiteer.getAllSkyLoc()
-
     companion object {
-        val viewingPlayer: MutableSet<String> = mutableSetOf()
+        val canViewIsland: MutableList<Island> = SQLiteer.getAllSkyLoc()
+        val viewingIndex: MutableMap<String, Int> = mutableMapOf()
     }
 
-    fun startView() {
-        if (viewingPlayer.contains(player.uniqueId.toString()))
+    fun startView(index: Int = 1) {
+        if (viewingIndex.contains(player.uniqueId.toString())) {
+            player.sendMessage("冷却中... ${((viewingIndex[player.uniqueId.toString()]!! + 1.0) / canViewIsland.size) * 100} %")
             return
-        viewingPlayer.add(player.uniqueId.toString())
-        val listIterator = canViewIsland.listIterator()
+        }
+        viewingIndex[player.uniqueId.toString()] = index
+        val listIterator = if (index < canViewIsland.size) {
+            canViewIsland.listIterator(index - 1)
+        } else {
+            canViewIsland.listIterator(0)
+        }
 
         Bukkit.getOnlinePlayers().forEach {
             if (player != it)
@@ -32,18 +37,19 @@ class IslandViewer(private val player: Player) {
             override fun run() {
                 if (!listIterator.hasNext()) {
                     this.cancel()
-                    viewingPlayer.remove(player.uniqueId.toString())
+                    viewingIndex.remove(player.uniqueId.toString())
                     player.tpIsland(Sky.SPAWN)
                     player.gameMode = GameMode.SURVIVAL
                     player.sendMessage("参观结束")
                     return
                 }
                 player.gameMode = GameMode.SPECTATOR
+                viewingIndex[player.uniqueId.toString()] = listIterator.nextIndex()
                 val next = listIterator.next()
                 player.tpIsland(next)
                 player.sendMessage("${canViewIsland.indexOf(next) + 1} / ${canViewIsland.size} : ${next.SkyLoc} ${next.getOwnersList()}")
             }
-        }.runTaskTimer(FiFuSky.fs, 20, 20 * 10)
+        }.runTaskTimer(FiFuSky.fs, 0, 20 * 10)
     }
 
 }
