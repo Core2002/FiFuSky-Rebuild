@@ -157,7 +157,7 @@ object SkyOperator {
         Bukkit.getScheduler().runTask(FiFuSky.fs, Runnable {
             FiFuSky.fs.logger.info("开始拷贝初始空岛:$command")
             Bukkit.getServer().dispatchCommand(Bukkit.getConsoleSender(), command)
-            world.getBlockAt(ic.first, 64, ic.second).setType(Material.BEDROCK, true)
+            world.getBlockAt(ic.first, 60, ic.second).setType(Material.BEDROCK, true)
             FiFuSky.fs.logger.info("复制完毕！$this 耗时 ${System.currentTimeMillis() - t} ms。")
         })
 /*

@@ -40,7 +40,7 @@ class Honey : Listener {
                         override fun run() {
                             player.isFlying = false
                             player.allowFlight = false
-                            Honey.honeyPlayer.remove(uuid)
+                            honeyPlayer.remove(uuid)
                         }
                     }.runTaskLater(FiFuSky.fs, 200)
                     player.sendMessage("短暂飞行将在200个tick后结束")

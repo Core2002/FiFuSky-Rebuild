@@ -25,6 +25,7 @@ import `fun`.fifu.fifusky.operators.SkyOperator.setAllowExplosion
 import `fun`.fifu.fifusky.operators.SkyOperator.toChunkLoc
 import `fun`.fifu.fifusky.operators.SkyOperator.tpIsland
 import `fun`.fifu.fifusky.operators.SoundPlayer
+import `fun`.fifu.fifusky.operators.Tpaer
 import cn.hutool.cache.Cache
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -66,12 +67,17 @@ class SkyCommand : TabExecutor {
         "renounce" to "/s renounce 放弃你所在的岛屿",
         "biome" to "/s biome [生物群系/编号] 修改当前区块的生物群系，不填则是查看",
         "chunk" to "例：/s chunk AllowExplosion <on/off> 来修改区块可爆炸属性，其他以此类推",
-        "view" to "/s view [index=0] 参观别人的岛屿,默认起点是index=0"
+        "view" to "/s view [index=0] 参观别人的岛屿,默认起点是index=0",
+        "tpa" to "/s tpa [player] 接受传送/请求传送到[player]"
     )
 
     override fun onTabComplete(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): MutableList<String> {
         if (p3.size == 1) return helpMassage.keys.toMutableList()
         val ml = mutableListOf<String>()
+        val playersName = mutableListOf<String>()
+        Bukkit.getOnlinePlayers().forEach {
+            playersName.add(it.name)
+        }
         return when (p3[0]) {
             "biome" -> {
                 if (p3.size == 1) Biome.values().forEach { ml.add(it.name) };ml
@@ -79,6 +85,11 @@ class SkyCommand : TabExecutor {
             "chunk" -> {
                 if (p3.size == 2) ml.add("AllowExplosion")
                 if (p3.size == 3) ml.add("on");ml.add("off")
+                ml
+            }
+            "tpa" -> {
+                if (p3.size == 2)
+                    ml.addAll(playersName)
                 ml
             }
             else -> ml
@@ -109,6 +120,7 @@ class SkyCommand : TabExecutor {
                 "biome" -> onBiome(p0, p3)
                 "chunk" -> onChunk(p0, p3)
                 "view" -> onView(p0, p3)
+                "tpa" -> onTpa(p0, p3)
                 else -> false
             }
             if (!re) onHelp(p0, arrayOf("help", p3[0]))
@@ -121,9 +133,22 @@ class SkyCommand : TabExecutor {
         return true
     }
 
+    private fun onTpa(p0: Player, p3: Array<out String>): Boolean {
+        if (p3.size == 1)
+            Tpaer.tpa(p0)
+        else if (p3.size == 2) {
+            val goto = Bukkit.getPlayer(p3[1])
+            if (goto?.isOnline == true)
+                Tpaer.tpa(p0, goto)
+            else
+                p0.sendMessage("玩家 ${p3[1]} 不在线")
+        }
+        return true
+    }
+
     private fun onView(p0: Player, p3: Array<out String>): Boolean {
         if (p3.size == 2)
-            IslandViewer.startView(p0,p3[1].toInt())
+            IslandViewer.startView(p0, p3[1].toInt())
         else
             IslandViewer.startView(p0)
         return true
