@@ -123,9 +123,9 @@ class SkyCommand : TabExecutor {
 
     private fun onView(p0: Player, p3: Array<out String>): Boolean {
         if (p3.size == 2)
-            IslandViewer(p0).startView(p3[1].toInt())
+            IslandViewer.startView(p0,p3[1].toInt())
         else
-            IslandViewer(p0).startView()
+            IslandViewer.startView(p0)
         return true
     }
 

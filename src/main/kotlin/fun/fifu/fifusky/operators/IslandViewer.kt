@@ -11,13 +11,11 @@ import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 
-class IslandViewer(private val player: Player) {
-    companion object {
-        val canViewIsland: MutableList<Island> = SQLiteer.getAllSkyLoc()
-        val viewingIndex: MutableMap<String, Int> = mutableMapOf()
-    }
+object IslandViewer {
+    val canViewIsland: MutableList<Island> = SQLiteer.getAllSkyLoc()
+    val viewingIndex: MutableMap<String, Int> = mutableMapOf()
 
-    fun startView(index: Int = 1) {
+    fun startView(player: Player, index: Int = 1) {
         if (viewingIndex.contains(player.uniqueId.toString())) {
             player.sendMessage("冷却中... ${((viewingIndex[player.uniqueId.toString()]!! + 1.0) / canViewIsland.size) * 100} %")
             return
@@ -31,7 +29,7 @@ class IslandViewer(private val player: Player) {
 
         Bukkit.getOnlinePlayers().forEach {
             if (player != it)
-                it.sendMessage("玩家 ${it.name} 正在参观本服岛屿，赶快输入 /s view 试试吧!")
+                it.sendMessage("玩家 ${player.name} 正在参观本服岛屿，赶快输入 /s view 试试吧!")
         }
         object : BukkitRunnable() {
             override fun run() {
