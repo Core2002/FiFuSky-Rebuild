@@ -6,7 +6,10 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockFormEvent
 
-
+/**
+ * 模块：挖石出矿
+ * @author NekokeCore
+ */
 class Minerals : Listener {
     private fun getBlock(m: Material, b: Int): Material {
         val minerals = (Math.random() * 100).toInt()

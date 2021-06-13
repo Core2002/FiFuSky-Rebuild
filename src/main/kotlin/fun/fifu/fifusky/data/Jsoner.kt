@@ -4,6 +4,10 @@ import cn.hutool.cache.file.LFUFileCache
 import cn.hutool.json.JSONUtil
 import java.io.File
 
+/**
+ * Json造作者单例，负责操作Json数据
+ * @author NekokeCore
+ */
 object Jsoner {
     var cache: LFUFileCache = LFUFileCache(1000, 50, 8 * 1000)
     private val PlayerLastGet: File = File("plugins/FiFuSky/PlayerLastGet.json")

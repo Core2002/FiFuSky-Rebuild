@@ -6,27 +6,22 @@ import java.net.URLClassLoader
 import java.util.*
 import java.util.jar.JarFile
 
+/**
+ * 工具类：包
+ * @author NekokeCore
+ */
 object PackageUtil {
-    /**
-     * 获取某包下（包括该包的所有子包）所有类
-     * @param packageName 包名
-     * @return 类的完整名称
-     */
-    fun getClassName(packageName: String): List<String?>? {
-        return getClassName(packageName, true)
-    }
-
     /**
      * 获取某包下所有类
      * @param packageName 包名
      * @param childPackage 是否遍历子包
      * @return 类的完整名称
      */
-    fun getClassName(packageName: String, childPackage: Boolean): List<String?>? {
+    private fun getClassName(packageName: String, childPackage: Boolean = true): List<String?>? {
         var fileNames: List<String?>? = null
 //        val loader = Thread.currentThread().contextClassLoader
         val loader = this.javaClass.classLoader
-        val packagePath = packageName.replace(".", "/")
+        val packagePath = packageName.replace('.', '/').replace('\\', '/')
         val url = loader.getResource(packagePath)
         if (url != null) {
             val type = url.protocol
@@ -47,11 +42,11 @@ object PackageUtil {
      * @param childPackage 是否遍历子包
      * @return 类的完整名称
      */
-    private fun getClassNameByFile(filePath: String, childPackage: Boolean): List<String> {
+    fun getClassNameByFile(filePath: String, childPackage: Boolean): List<String> {
         val myClassName: MutableList<String> = ArrayList()
         val file = File(filePath)
         val childFiles = file.listFiles()
-        for (childFile in childFiles) {
+        if (!childFiles.isNullOrEmpty()) for (childFile in childFiles) {
             if (childFile.isDirectory) {
                 if (childPackage) {
                     myClassName.addAll(getClassNameByFile(childFile.path, childPackage))
@@ -71,14 +66,15 @@ object PackageUtil {
 
     /**
      * 从jar获取某包下所有类
-     * @param jarPath jar文件路径
+     * @param jarPath jar文件路径，示例：D://CraftKotlin.jar!.
      * @param childPackage 是否遍历子包
      * @return 类的完整名称
      */
     fun getClassNameByJar(jarPath: String, childPackage: Boolean): List<String?> {
         val myClassName: MutableList<String?> = ArrayList()
-        val jarInfo = jarPath.split("!").toTypedArray()
-        val jarFilePath = jarInfo[0].substring(jarInfo[0].indexOf("/"))
+        val jarInfo = jarPath.replace('\\', '/').split("!").toTypedArray()
+        val indexOf = jarInfo[0].indexOf("/")
+        val jarFilePath = jarInfo[0].substring(indexOf)
         val packagePath = jarInfo[1].substring(1)
         try {
             val jarFile = JarFile(jarFilePath)
@@ -94,8 +90,7 @@ object PackageUtil {
                         }
                     } else {
                         val index = entryName.lastIndexOf("/")
-                        var myPackagePath: String
-                        myPackagePath = if (index != -1) {
+                        val myPackagePath: String = if (index != -1) {
                             entryName.substring(0, index)
                         } else {
                             entryName
@@ -120,7 +115,7 @@ object PackageUtil {
      * @param childPackage 是否遍历子包
      * @return 类的完整名称
      */
-    fun getClassNameByJars(urls: Array<URL>?, packagePath: String, childPackage: Boolean): List<String?> {
+    private fun getClassNameByJars(urls: Array<URL>?, packagePath: String, childPackage: Boolean): List<String?> {
         val myClassName: MutableList<String?> = ArrayList()
         if (urls != null) {
             for (i in urls.indices) {

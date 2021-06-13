@@ -72,6 +72,7 @@ class SkyCommand : TabExecutor {
     )
 
     override fun onTabComplete(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): MutableList<String> {
+        if (p0 !is Player) return mutableListOf()
         if (p3.size == 1) return helpMassage.keys.toMutableList()
         val ml = mutableListOf<String>()
         val playersName = mutableListOf<String>()
@@ -80,16 +81,31 @@ class SkyCommand : TabExecutor {
         }
         return when (p3[0]) {
             "biome" -> {
-                if (p3.size == 1) Biome.values().forEach { ml.add(it.name) };ml
+                if (p3.size == 2) Biome.values().forEach { ml.add(it.name) };ml
             }
             "chunk" -> {
                 if (p3.size == 2) ml.add("AllowExplosion")
-                if (p3.size == 3) ml.add("on");ml.add("off")
+                if (p3.size == 3) {
+                    ml.add("on")
+                    ml.add("off")
+                }
                 ml
             }
-            "tpa" -> {
+            "tpa", "add-member", "remove-member" -> {
                 if (p3.size == 2)
                     ml.addAll(playersName)
+                ml
+            }
+            "go" -> {
+                if (p3.size == 2) {
+                    ml.addAll(p0.getIslandHomes().first.split(' '))
+                    ml.addAll(p0.getIslandHomes().second.split(' '))
+                }
+                ml
+            }
+            "help" -> {
+                if (p3.size == 2)
+                    ml.addAll(helpMassage.keys)
                 ml
             }
             else -> ml

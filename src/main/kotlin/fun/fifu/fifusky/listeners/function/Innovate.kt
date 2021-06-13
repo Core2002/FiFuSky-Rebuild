@@ -15,7 +15,10 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.player.PlayerInteractEvent
 
-
+/**
+ * 模块：黑曜石变岩浆
+ * @author NekokeCore
+ */
 class Innovate : Listener {
 
     /**

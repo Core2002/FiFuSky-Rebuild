@@ -10,7 +10,10 @@ import org.bukkit.event.player.PlayerBucketEmptyEvent
 import org.bukkit.event.player.PlayerBucketFillEvent
 import org.bukkit.event.player.PlayerInteractEvent
 
-
+/**
+ * 权限组：方块类权限处理
+ * @author NekokeCore
+ */
 class BlockListener : Listener {
 
     var str = "你没权限"

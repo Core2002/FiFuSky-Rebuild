@@ -7,7 +7,10 @@ import java.util.*
 
 import org.bukkit.scheduler.BukkitRunnable
 
-
+/**
+ * Tpa操作者单例，负责处理玩家的tpa请求
+ * @author NekokeCore
+ */
 object Tpaer {
     var tpaRequest: MutableMap<String, String> = HashMap()
 

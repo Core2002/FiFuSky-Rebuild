@@ -11,6 +11,10 @@ import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 
+/**
+ * 岛屿参观操作者单例，负责带领玩家参观岛屿
+ * @author NekokeCore
+ */
 object IslandViewer {
     val canViewIsland: MutableList<Island> = SQLiteer.getAllSkyLoc()
     val viewingIndex: MutableMap<String, Int> = mutableMapOf()

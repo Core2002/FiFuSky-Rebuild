@@ -11,7 +11,10 @@ import org.bukkit.inventory.ItemStack
 
 import java.util.ArrayList
 
-
+/**
+ * 模块:喝蜂蜜起飞
+ * @author NekokeCore
+ */
 class Honey : Listener {
     companion object {
         var honeyPlayer: MutableList<String> = ArrayList()

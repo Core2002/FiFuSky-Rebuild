@@ -18,7 +18,10 @@ import org.bukkit.inventory.MerchantInventory
 import org.bukkit.inventory.PlayerInventory
 import org.bukkit.entity.Player
 
-
+/**
+ * 权限组：实体类权限处理
+ * @author NekokeCore
+ */
 class EntityListener : Listener {
     /**
      * 当一个生物体在世界中出生时触发该事件.

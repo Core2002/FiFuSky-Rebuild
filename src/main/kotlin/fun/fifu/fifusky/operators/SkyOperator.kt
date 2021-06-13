@@ -18,7 +18,10 @@ import org.bukkit.scheduler.BukkitRunnable
 import java.lang.StringBuilder
 import org.bukkit.Bukkit
 
-
+/**
+ * 岛屿操作者单例，内聚了很多操作以及方法扩展
+ * @author NekokeCore
+ */
 object SkyOperator {
 
     /**

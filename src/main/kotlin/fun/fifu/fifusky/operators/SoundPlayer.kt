@@ -7,6 +7,7 @@ import kotlin.collections.ArrayList
 
 /**
  * 声音播放器单例
+ * @author NekokeCore
  */
 object SoundPlayer {
     var catList = ArrayList<Sound>()

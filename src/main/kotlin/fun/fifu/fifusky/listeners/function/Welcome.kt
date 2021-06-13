@@ -9,6 +9,10 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 
+/**
+ * 模块:欢迎萌新
+ * @author NekokeCore
+ */
 class Welcome : Listener {
 
     @EventHandler
