@@ -17,7 +17,7 @@ object PackageUtil {
      * @param childPackage 是否遍历子包
      * @return 类的完整名称
      */
-    private fun getClassName(packageName: String, childPackage: Boolean = true): List<String?>? {
+    fun getClassName(packageName: String, childPackage: Boolean = true): List<String?>? {
         var fileNames: List<String?>? = null
 //        val loader = Thread.currentThread().contextClassLoader
         val loader = this.javaClass.classLoader

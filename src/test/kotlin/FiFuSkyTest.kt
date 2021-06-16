@@ -1,3 +1,4 @@
+import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.utils.PackageUtil
 import `fun`.fifu.utils.PackageUtil.getClassNameByFile
 import `fun`.fifu.utils.PackageUtil.getClassNameByJar
@@ -13,15 +14,9 @@ class FiFuSkyTest {
     }
 
     fun test() {
+        println(Sky.getIsland("(29296,29296)"))
         println("OK")
-        PackageUtil.getClassName("fun.fifu.fifusky.listeners")?.forEach {
-            println(it)
-        }
-        "zhong xiao bai zui shuai".split(' ').forEach(System.out::println)
 
-        getClassNameByJar("C:\\Users\\core2\\IdeaProjects\\ZxbSkyWorldPlugin\\build\\libs\\ZxbSkyWorldPlugin-1.0-SNAPSHOT.jar!.",true).forEach {
-            println(it)
-        }
 
 
 

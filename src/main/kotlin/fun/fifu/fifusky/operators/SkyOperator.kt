@@ -15,8 +15,6 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
-import java.lang.StringBuilder
-import org.bukkit.Bukkit
 
 /**
  * 岛屿操作者单例，内聚了很多操作以及方法扩展
@@ -30,7 +28,7 @@ object SkyOperator {
      */
     fun Player.tpIsland(island: Island) {
         val isLandCenter = Sky.getIslandCenter(island)
-        this.teleport(
+        teleport(
             Location(
                 Bukkit.getWorld("world"),
                 isLandCenter.first.toDouble(),
@@ -38,7 +36,7 @@ object SkyOperator {
                 isLandCenter.second.toDouble()
             )
         )
-        this.sendTitle(island.toString(), "主人 ${island.getOwnersList()}", 2, 20 * 3, 6)
+        sendTitle(island.toString(), "主人 ${island.getOwnersList()}", 2, 20 * 3, 6)
         SoundPlayer.playCat(this)
     }
 
@@ -64,9 +62,9 @@ object SkyOperator {
         val y2 = 69
         val z2 = 516
         //目标原点
-        val xxx = this.X + Sky.SIDE / 2 + xx.toDouble()
+        val xxx = X + Sky.SIDE / 2 + xx.toDouble()
         val yyy = 64 + yy.toDouble()
-        val zzz = this.Y + Sky.SIDE / 2 + zz.toDouble()
+        val zzz = Y + Sky.SIDE / 2 + zz.toDouble()
         //生成执行命令
         val command = "clone $x1 $y1 $z1 $x2 $y2 $z2 ${xxx.toInt()} ${yyy.toInt()} ${zzz.toInt()}"
         //自动加载区块
@@ -218,23 +216,13 @@ object SkyOperator {
      * @return 是否有权限
      */
     fun Player.havePermission(): Boolean {
-        val location = this.location
         if (!location.world.isSkyWorld())
             return true
-        if (this.gameMode == GameMode.SPECTATOR)
+        if (gameMode == GameMode.SPECTATOR)
             return true
-
-        val uuid = this.uniqueId.toString()
-
-        val privilege = SQLiteer.getIsLandData(Sky.getIsland(location.blockX, location.blockZ)).Privilege
-        privilege.Owner.forEach {
-            if (uuid == it.UUID)
-                return true
-        }
-        privilege.Member.forEach {
-            if (uuid == it.UUID)
-                return true
-        }
+        val island = location.getIsland()
+        if (isOwnedIsland(island) || isJoinedIsland(island))
+            return true
 
         return false
     }
@@ -250,7 +238,7 @@ object SkyOperator {
      * 判断世界是否是空岛世界
      * @return 世界是否是空岛世界
      */
-    fun World.isSkyWorld() = this.name == Sky.WORLD
+    fun World.isSkyWorld() = name == Sky.WORLD
 
     /**
      * 显示一个实体的血量给玩家
@@ -259,8 +247,8 @@ object SkyOperator {
     fun LivingEntity.showDamage(player: Player) {
         object : BukkitRunnable() {
             override fun run() {
-                val i = this@showDamage.health.toInt()
-                val j = this@showDamage.getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value.toInt()
+                val i = health.toInt()
+                val j = getAttribute(Attribute.GENERIC_MAX_HEALTH)!!.value.toInt()
                 var color = "§f"
                 val c = i / 1.0 / j
                 if (c in 0.825..1.0) {
@@ -276,7 +264,7 @@ object SkyOperator {
                 } else if (c < 0.165) {
                     color = "§4"
                 }
-                player.sendTitle("", color + this@showDamage.name + "->HP:" + i + "/" + j, 2, 20, 6)
+                player.sendTitle("", "$color$name->HP:$i/$j", 2, 20, 6)
             }
         }.runTaskLater(FiFuSky.fs, 1)
     }
@@ -333,17 +321,47 @@ object SkyOperator {
     fun Island.getIslandData() = SQLiteer.getIsLandData(this)
 
     /**
+     * 获取坐标所在的岛屿
+     * @return 坐标所在的岛屿
+     */
+    fun Location.getIsland() = Sky.getIsland(blockX, blockZ)
+
+    /**
      * 给目标岛屿添加一位主人
      * @param player 要添加的主人
      */
     fun Island.addOwner(player: Player) {
         val uuid = player.uniqueId.toString()
         val isLandData = SQLiteer.getIsLandData(this)
-        isLandData.Privilege.Owner.forEach {
-            if (uuid == it.UUID)
-                return
-        }
+        if (player.isOwnedIsland(isLandData.Island))
+            return
         isLandData.Privilege.Owner.add(PlayerData(UUID = uuid, LastName = player.name))
+        SQLiteer.saveIslandData(isLandData)
+    }
+
+    /**
+     * 给目标岛屿添加一位成员
+     * @param player 要添加的成员
+     */
+    fun Island.addMember(player: Player) {
+        val uuid = player.uniqueId.toString()
+        val isLandData = SQLiteer.getIsLandData(this)
+        if (player.isJoinedIsland(isLandData.Island))
+            return
+        isLandData.Privilege.Member.add(PlayerData(UUID = uuid, LastName = player.name))
+        SQLiteer.saveIslandData(isLandData)
+    }
+
+    /**
+     * 从目标岛屿删除一位成员
+     * @param player 要移除的成员
+     */
+    fun Island.removeMember(player: Player) {
+        val uuid = player.uniqueId.toString()
+        val isLandData = SQLiteer.getIsLandData(this)
+        if (!player.isJoinedIsland(isLandData.Island))
+            return
+        isLandData.Privilege.Member.remove(PlayerData(UUID = uuid, LastName = player.name))
         SQLiteer.saveIslandData(isLandData)
     }
 
@@ -352,7 +370,7 @@ object SkyOperator {
      * @return 第一个：是否可以领取岛，第二个：什么时间后可以领取
      */
     fun Player.canGetIsland(): Pair<Boolean, String> {
-        val uuid = this.uniqueId.toString()
+        val uuid = uniqueId.toString()
         val time = System.currentTimeMillis() - Jsoner.getPlayerLastGet(uuid)
         val lgy = DateUtils.MILLIS_PER_DAY * 30 * 2
         return Pair(time > lgy, DateUtil.formatBetween(lgy - time))
@@ -374,7 +392,7 @@ object SkyOperator {
      */
     fun Player.getIslandHomes(): Pair<String, String> {
         val sb = StringBuilder()
-        val homes = SQLiteer.getHomes(this.uniqueId.toString())
+        val homes = SQLiteer.getHomes(uniqueId.toString())
         homes.first.forEach {
             sb.append(it.Island).append(' ')
         }
@@ -395,6 +413,8 @@ object SkyOperator {
     fun Island.removeOwner(player: Player) {
         val uuid = player.uniqueId.toString()
         val isLandData = SQLiteer.getIsLandData(this)
+        if (!player.isOwnedIsland(isLandData.Island))
+            return
         val owners = isLandData.Privilege.Owner
         owners.remove(PlayerData(uuid, SQLiteer.getPlayerName(uuid)))
         SQLiteer.saveIslandData(isLandData)
@@ -408,7 +428,20 @@ object SkyOperator {
     fun Player.isOwnedIsland(island: Island): Boolean {
         val isLandData = SQLiteer.getIsLandData(island)
         isLandData.Privilege.Owner.forEach {
-            if (this.uniqueId.toString() == it.UUID) return true
+            if (uniqueId.toString() == it.UUID) return true
+        }
+        return false
+    }
+
+    /**
+     * 判断玩家是否是岛屿成员
+     * @param island 要检测的岛屿
+     * @return 玩家是否是岛屿的成员
+     */
+    fun Player.isJoinedIsland(island: Island): Boolean {
+        val isLandData = SQLiteer.getIsLandData(island)
+        isLandData.Privilege.Member.forEach {
+            if (uniqueId.toString() == it.UUID) return true
         }
         return false
     }
@@ -417,20 +450,20 @@ object SkyOperator {
      * 获取实体当前所在的岛屿
      * @return 当前实体所在的岛屿
      */
-    fun Entity.currentIsland(): Island = Sky.getIsland(this.location.blockX, this.location.blockZ)
+    fun Entity.currentIsland(): Island = Sky.getIsland(location.blockX, location.blockZ)
 
     /**
      * 获取区块的允许爆炸属性
      * @return 是否允许爆炸
      */
-    fun Chunk.getAllowExplosion() = SQLiteer.getChunkData(this.toChunkLoc()).AllowExplosion
+    fun Chunk.getAllowExplosion() = SQLiteer.getChunkData(toChunkLoc()).AllowExplosion
 
     /**
      * 更改区块的允许爆炸属性
      * @param switch 是否允许爆炸
      */
     fun Chunk.setAllowExplosion(switch: Boolean) {
-        val chunkData = SQLiteer.getChunkData(this.toChunkLoc())
+        val chunkData = SQLiteer.getChunkData(toChunkLoc())
         chunkData.AllowExplosion = switch
         SQLiteer.saveChunkData(chunkData)
     }
@@ -439,7 +472,7 @@ object SkyOperator {
      * 将该区块转换成ChunkLoc
      * @return 该区块的ChunkLoc
      */
-    fun Chunk.toChunkLoc() = "[${this.x},${this.z}]"
+    fun Chunk.toChunkLoc() = "[${x},${z}]"
 
 
     /**
@@ -447,8 +480,8 @@ object SkyOperator {
      * @return 坐标是否在主城
      */
     fun Location.inSpawn(): Boolean {
-        if (!this.world.isSkyWorld()) return false
-        if (Sky.isInIsland(this.blockX, this.blockZ, Sky.SPAWN)) return true
+        if (!world.isSkyWorld()) return false
+        if (Sky.isInIsland(blockX, blockZ, Sky.SPAWN)) return true
         return false
     }
 
