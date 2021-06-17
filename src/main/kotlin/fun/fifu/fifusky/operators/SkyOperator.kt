@@ -33,7 +33,9 @@ object SkyOperator {
                 Bukkit.getWorld("world"),
                 isLandCenter.first.toDouble(),
                 65.0,
-                isLandCenter.second.toDouble()
+                isLandCenter.second.toDouble(),
+                location.yaw,
+                location.pitch
             )
         )
         sendTitle(island.toString(), "主人 ${island.getOwnersList()}", 2, 20 * 3, 6)

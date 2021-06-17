@@ -5,7 +5,7 @@ import `fun`.fifu.fifusky.Island
 import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.data.PlayerData
 import `fun`.fifu.fifusky.data.SQLiteer
-import `fun`.fifu.fifusky.operators.IslandViewer
+import `fun`.fifu.fifusky.listeners.function.ViewIsland
 import `fun`.fifu.fifusky.operators.SkyOperator
 import `fun`.fifu.fifusky.operators.SkyOperator.addOwner
 import `fun`.fifu.fifusky.operators.SkyOperator.build
@@ -164,9 +164,9 @@ class SkyCommand : TabExecutor {
 
     private fun onView(p0: Player, p3: Array<out String>): Boolean {
         if (p3.size == 2)
-            IslandViewer.startView(p0, p3[1].toInt())
+            ViewIsland.startViewAll(p0, p3[1].toInt())
         else
-            IslandViewer.startView(p0)
+            ViewIsland.startViewAll(p0)
         return true
     }
 
