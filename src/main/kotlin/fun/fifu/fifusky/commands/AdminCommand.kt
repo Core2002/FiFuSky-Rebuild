@@ -2,50 +2,30 @@ package `fun`.fifu.fifusky.commands
 
 import `fun`.fifu.fifusky.FiFuSky
 import `fun`.fifu.fifusky.Sky
+import `fun`.fifu.fifusky.listeners.function.FiFuItems
 import `fun`.fifu.fifusky.operators.SkyOperator.addMember
 import `fun`.fifu.fifusky.operators.SkyOperator.build
 import `fun`.fifu.fifusky.operators.SkyOperator.getIsland
 import `fun`.fifu.fifusky.operators.SkyOperator.isSkyWorld
 import `fun`.fifu.fifusky.operators.SkyOperator.removeMember
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabExecutor
-import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.ItemMeta
-import java.util.*
+import kotlin.reflect.full.*
+import kotlin.reflect.jvm.javaType
 
 
-class AdminCommand : TabExecutor {
-
-    companion object{
-        fun theIcarus(): ItemStack {
-            val itemStack = ItemStack(Material.ELYTRA)
-            val im: ItemMeta = itemStack.itemMeta
-            im.setDisplayName("钉三多的翅膀")
-            im.lore = Collections.singletonList("组成翅膀的羽毛来自伊卡洛斯")
-            im.addEnchant(Enchantment.DEPTH_STRIDER, 10, true)
-            im.addEnchant(Enchantment.OXYGEN, 10, true)
-            im.addEnchant(Enchantment.PROTECTION_FALL, 10, true)
-            im.addEnchant(Enchantment.PROTECTION_PROJECTILE, 10, true)
-            im.addEnchant(Enchantment.BINDING_CURSE, 1, true)
-            im.addEnchant(Enchantment.PROTECTION_FIRE, 10, true)
-            im.addEnchant(Enchantment.PROTECTION_ENVIRONMENTAL, 10, true)
-            im.isUnbreakable = true
-            itemStack.itemMeta = im
-            return itemStack
-        }
-    }
-
+class AdminCommand() : TabExecutor {
+    private val fiFuItems = mutableListOf<String>()
 
     private val helpMassage = mapOf(
         "build-island" to "/fs-admin build-island <Skyloc> 来build一个岛",
         "make-member" to "/fs-admin make-member 将自己纳入该岛屿的成员",
         "exit-member" to "/fs-admin exit-member 将自己退出该岛屿成员",
-        "get-theIcarus" to "/fs-admin get-theIcarus 获得钉三多的翅膀"
+        "get-item" to "/fs-admin get-item <FiFuItem> 获得FiFuItem"
     )
 
     override fun onTabComplete(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): MutableList<String> {
@@ -56,7 +36,9 @@ class AdminCommand : TabExecutor {
         Bukkit.getOnlinePlayers().forEach {
             playersName.add(it.name)
         }
+
         return when (p3[0]) {
+            "get-item" -> fiFuItems
             else -> ml
         }
     }
@@ -82,11 +64,11 @@ class AdminCommand : TabExecutor {
                 return true
             }
             val re = when (p3[0]) {
-                "help" -> onHelp(p0,p3)
+                "help" -> onHelp(p0, p3)
                 "build-island" -> onBuild(p3)
                 "make-member" -> onMakeMember(p0)
                 "exit-member" -> onExitMember(p0)
-                "get-theIcarus" -> onGetTheIcarus(p0)
+                "get-item" -> onGetItem(p0, p3)
                 else -> false
             }
             if (!re) onHelp(p0, arrayOf("help", p3[0]))
@@ -100,8 +82,14 @@ class AdminCommand : TabExecutor {
 
     }
 
-    private fun onGetTheIcarus(p0: Player): Boolean {
-        p0.inventory.addItem(theIcarus())
+    private fun onGetItem(p0: Player, p3: Array<out String>): Boolean {
+        if (!fiFuItems.contains(p3[1]))
+            return true
+        FiFuItems::class.companionObject?.functions?.filter { it.name == p3[1] }?.forEach {
+            println("反射到物品 ${it.name}")
+            val awa = it.call(FiFuItems::class.companionObjectInstance) as ItemStack
+            p0.inventory.addItem(awa)
+        }
         return true
     }
 
@@ -132,5 +120,13 @@ class AdminCommand : TabExecutor {
             helpMassage[p3[1]]?.let { player.sendMessage(it) }
         }
         return true
+    }
+
+    init {
+        FiFuItems::class.companionObject?.functions?.filter {
+            it.returnType.javaType.typeName == "org.bukkit.inventory.ItemStack"
+        }?.forEach {
+            fiFuItems.add(it.name)
+        }
     }
 }
