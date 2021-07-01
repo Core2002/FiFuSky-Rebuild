@@ -7,11 +7,12 @@ import `fun`.fifu.fifusky.data.SQLiteer
 import `fun`.fifu.fifusky.operators.SkyOperator.getIsland
 import `fun`.fifu.fifusky.operators.SkyOperator.getOwnersList
 import `fun`.fifu.fifusky.operators.SkyOperator.tpIsland
-import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.block.Action
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerItemHeldEvent
 import org.bukkit.scheduler.BukkitRunnable
 
@@ -44,10 +45,7 @@ class ViewIsland : Listener {
                 canViewIsland.listIterator(0)
             }
 
-            Bukkit.getOnlinePlayers().forEach {
-                if (player != it)
-                    it.sendMessage("玩家 ${player.name} 正在参观本服岛屿，赶快输入 /s view-all 试试吧!")
-            }
+            player.sendMessage("你正在参观岛屿，退出游戏即可退出。")
             object : BukkitRunnable() {
                 override fun run() {
                     if (!listIterator.hasNext()) {
@@ -70,6 +68,9 @@ class ViewIsland : Listener {
 
     private val starViewingIndex: MutableMap<String, Int> = mutableMapOf()
 
+    /**
+     * 副手手持弈颗星，滚轮参观全服岛屿
+     */
     @EventHandler
     fun starView(event: PlayerItemHeldEvent) {
         if (event.player.inventory.itemInOffHand != FiFuItems.theStar())
@@ -106,6 +107,33 @@ class ViewIsland : Listener {
         )
 //        println("index: $index newSlot: ${event.newSlot}  previousSlot:${event.previousSlot}")
 
+    }
+
+    var tags = mutableSetOf<Island>()
+
+    /**
+     * 标记岛屿的功能
+     * 副手手持弈颗星，左键标记，右键取消，左击方块输出到控制台
+     */
+    @EventHandler
+    fun makeTag(event: PlayerInteractEvent) {
+        if (event.player.inventory.itemInOffHand != FiFuItems.theStar())
+            return
+        when (event.action) {
+            Action.LEFT_CLICK_AIR -> {
+                tags.add(event.player.location.getIsland())
+                event.player.sendMessage("已从tags添加当前岛屿，现在共添加了 ${tags.size} 个岛屿")
+            }
+            Action.RIGHT_CLICK_AIR -> {
+                tags.remove(event.player.location.getIsland())
+                event.player.sendMessage("已从tags移除当前岛屿，现在共添加了 ${tags.size} 个岛屿")
+            }
+            Action.LEFT_CLICK_BLOCK -> {
+                FiFuSky.fs.logger.info(tags.toString())
+                event.player.sendMessage("已将tags发送至控制台，共 ${tags.size} 个岛屿")
+            }
+            else -> return
+        }
     }
 
 }

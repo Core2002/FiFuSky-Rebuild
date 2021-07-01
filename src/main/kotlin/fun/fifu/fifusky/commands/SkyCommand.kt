@@ -67,8 +67,8 @@ class SkyCommand : TabExecutor {
         "renounce" to "/s renounce 放弃你所在的岛屿",
         "biome" to "/s biome [生物群系/编号] 修改当前区块的生物群系，不填则是查看",
         "chunk" to "例：/s chunk AllowExplosion <on/off> 来修改区块可爆炸属性，其他以此类推",
-        "view-all" to "/s view-all [index=0] 参观别人的岛屿,默认起点是index=0",
-        "tpa" to "/s tpa [player] 接受传送/请求传送到[player]"
+//        "view-all" to "/s view-all [index=0] 参观别人的岛屿,默认起点是index=0",
+        "tpa" to "/s tpa [玩家名] 接受传送/请求传送到[玩家名]"
     )
 
     override fun onTabComplete(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): MutableList<String> {
@@ -119,7 +119,7 @@ class SkyCommand : TabExecutor {
         }
         if (p3.isNullOrEmpty()) return onS(p0)
         try {
-            if (!p0.world.isSkyWorld()) {
+            if (!p0.world.isSkyWorld() && !arrayOf("help", "?", "homes", "go", "tpa").contains(p3[0])) {
                 p0.sendMessage("你必须在空岛世界才能使用这条命令")
                 return true
             }
@@ -135,7 +135,7 @@ class SkyCommand : TabExecutor {
                 "renounce" -> onRenounce(p0, p3)
                 "biome" -> onBiome(p0, p3)
                 "chunk" -> onChunk(p0, p3)
-                "view-all" -> onViewAll(p0, p3)
+//                "view-all" -> onViewAll(p0, p3)
                 "tpa" -> onTpa(p0, p3)
                 else -> false
             }

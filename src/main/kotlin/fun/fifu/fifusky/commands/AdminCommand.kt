@@ -18,7 +18,7 @@ import kotlin.reflect.full.*
 import kotlin.reflect.jvm.javaType
 
 
-class AdminCommand() : TabExecutor {
+class AdminCommand : TabExecutor {
     private val fiFuItems = mutableListOf<String>()
 
     private val helpMassage = mapOf(
