@@ -28,7 +28,9 @@ class AdminCommand : TabExecutor {
         "build-island" to "/fs-admin build-island <Skyloc> 来build一个岛",
         "make-member" to "/fs-admin make-member 将自己纳入该岛屿的成员",
         "exit-member" to "/fs-admin exit-member 将自己退出该岛屿成员",
-        "get-item" to "/fs-admin get-item <FiFuItem> 获得FiFuItem"
+        "get-item" to "/fs-admin get-item <FiFuItem> 获得FiFuItem",
+        "view-player-inventory" to "/fs-admin view-player-inventory <玩家名> 查看玩家的背包",
+        "view-player-ender-chest" to "fs-admin view-player-ender-chest <玩家名> 查看玩家的末影箱"
     )
 
     override fun onTabComplete(p0: CommandSender, p1: Command, p2: String, p3: Array<out String>): MutableList<String> {
@@ -42,6 +44,7 @@ class AdminCommand : TabExecutor {
 
         return when (p3[0]) {
             "get-item" -> fiFuItems
+            "view-player-inventory", "view-player-ender-chest" -> playersName
             else -> ml
         }
     }
@@ -72,6 +75,8 @@ class AdminCommand : TabExecutor {
                 "make-member" -> onMakeMember(p0)
                 "exit-member" -> onExitMember(p0)
                 "get-item" -> onGetItem(p0, p3)
+                "view-player-inventory" -> onViewPlayerInventory(p0, p3)
+                "view-player-ender-chest" -> onViewPlayerEnderChest(p0, p3)
                 else -> false
             }
             if (!re) onHelp(p0, arrayOf("help", p3[0]))
@@ -83,6 +88,22 @@ class AdminCommand : TabExecutor {
         }
         return true
 
+    }
+
+    private fun onViewPlayerEnderChest(p0: Player, p3: Array<out String>): Boolean {
+        if (p3[1].isEmpty())
+            return true
+        p0.closeInventory()
+        Bukkit.getPlayer(p3[1])?.enderChest?.let { p0.openInventory(it) }
+        return true
+    }
+
+    private fun onViewPlayerInventory(p0: Player, p3: Array<out String>): Boolean {
+        if (p3[1].isEmpty())
+            return true
+        p0.closeInventory()
+        Bukkit.getPlayer(p3[1])?.inventory?.let { p0.openInventory(it) }
+        return true
     }
 
     private fun onGetItem(p0: Player, p3: Array<out String>): Boolean {
