@@ -10,6 +10,7 @@ package `fun`.fifu.fifusky
  * yy代表y坐标终止位置
  *
  * r代表x，y相等，以此类推
+ * @author NekokeCore
  */
 data class Island(
     val SkyLoc: Pair<Int, Int>,

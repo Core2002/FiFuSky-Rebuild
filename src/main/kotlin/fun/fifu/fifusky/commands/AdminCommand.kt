@@ -17,7 +17,10 @@ import org.bukkit.inventory.ItemStack
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.javaType
 
-
+/**
+ * 管理命令
+ * @author NekokeCore
+ */
 class AdminCommand : TabExecutor {
     private val fiFuItems = mutableListOf<String>()
 

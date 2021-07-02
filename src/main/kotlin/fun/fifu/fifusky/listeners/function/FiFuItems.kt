@@ -8,6 +8,7 @@ import java.util.*
 
 /**
  * 这里存储了FiFu的物品
+ * @author NekokeCore
  */
 class FiFuItems {
     companion object {

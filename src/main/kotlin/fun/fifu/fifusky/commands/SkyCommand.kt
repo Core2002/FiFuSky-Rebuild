@@ -44,6 +44,7 @@ import java.util.*
 
 /**
  * 玩家命令
+ * @author NekokeCore
  */
 class SkyCommand : TabExecutor {
     private val lruCache: Cache<UUID, String> = CacheUtil.newLRUCache(8 * 1000)
@@ -440,6 +441,10 @@ class SkyCommand : TabExecutor {
         return sb.toString()
     }
 
+    /**
+     * 判断字符串是否为数字
+     * @return true：是数字 false：不是数字
+     */
     private fun String.isInt(): Boolean {
         return try {
             this.toInt()
