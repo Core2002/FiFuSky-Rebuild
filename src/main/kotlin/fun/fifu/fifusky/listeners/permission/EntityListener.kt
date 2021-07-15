@@ -3,6 +3,9 @@ package `fun`.fifu.fifusky.listeners.permission
 import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.operators.SkyOperator
 import `fun`.fifu.fifusky.operators.SkyOperator.havePermission
+import `fun`.fifu.fifusky.operators.SkyOperator.inProtectionRadius
+import `fun`.fifu.fifusky.operators.SkyOperator.inSpawn
+import `fun`.fifu.fifusky.operators.SkyOperator.isSkyWorld
 import `fun`.fifu.fifusky.operators.SkyOperator.showDamage
 import org.bukkit.Chunk
 import org.bukkit.entity.*
@@ -30,10 +33,8 @@ class EntityListener : Listener {
      */
     @EventHandler
     fun onCreatureSpawn(event: CreatureSpawnEvent) {
-        if (event.location.world.name != Sky.WORLD) return
-        val xx = event.location.x.toInt()
-        val zz = event.location.z.toInt()
-        if (Sky.isInIsland(xx, zz, Sky.SPAWN) && event.entity is Monster) {
+        if (!event.location.world.isSkyWorld()) return
+        if (event.entity.location.inSpawn() && event.entity is Monster) {
             event.isCancelled = true
         }
     }
@@ -45,10 +46,10 @@ class EntityListener : Listener {
      */
     @EventHandler(ignoreCancelled = true)
     fun onEntityExplode(explodeEvent: EntityExplodeEvent) {
-        if (explodeEvent.location.world.name != Sky.WORLD) return
+        if (!explodeEvent.location.world.isSkyWorld()) return
         val chunk: Chunk = explodeEvent.location.chunk
-        val CLoc: String = "[${chunk.x},${chunk.z}]"
-        if (SkyOperator.canExplosion(CLoc)) {
+        val chunkLoc = "[${chunk.x},${chunk.z}]"
+        if (SkyOperator.canExplosion(chunkLoc)) {
             return
         }
         explodeEvent.blockList().clear()
@@ -62,7 +63,7 @@ class EntityListener : Listener {
      */
     @EventHandler
     fun onOpen(event: InventoryOpenEvent) {
-        if (event.player.location.world.name != Sky.WORLD) return
+        if (!event.player.location.world.isSkyWorld()) return
         val inventory = event.inventory
         if (inventory is PlayerInventory || inventory is MerchantInventory || inventory is CraftingInventory || inventory is EnchantingInventory) {
             return
@@ -96,12 +97,10 @@ class EntityListener : Listener {
      */
     @EventHandler
     fun onEntityDamageByEntity(event: EntityDamageByEntityEvent) {
-        //todo 保护区域
-//        if (Helper.hasSpawnProtection(event.entity.location)) {
-//            event.isCancelled = true
-//            return
-//        }
         val entity: Entity = event.entity
+        if (entity.inProtectionRadius()) {
+            event.isCancelled = true
+        }
         val loc = entity.location
         if (entity is LivingEntity) {
             if (event.damager is Player) {

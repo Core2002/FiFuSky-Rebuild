@@ -7,6 +7,7 @@ import `fun`.fifu.fifusky.data.PlayerData
 import `fun`.fifu.fifusky.data.SQLiteer
 import `fun`.fifu.fifusky.listeners.function.ViewIsland
 import `fun`.fifu.fifusky.operators.SkyOperator
+import `fun`.fifu.fifusky.operators.SkyOperator.Spawn
 import `fun`.fifu.fifusky.operators.SkyOperator.addOwner
 import `fun`.fifu.fifusky.operators.SkyOperator.build
 import `fun`.fifu.fifusky.operators.SkyOperator.currentIsland
@@ -28,7 +29,6 @@ import `fun`.fifu.fifusky.operators.SoundPlayer
 import `fun`.fifu.fifusky.operators.Tpaer
 import cn.hutool.cache.Cache
 import org.bukkit.Bukkit
-import org.bukkit.Location
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabExecutor
@@ -414,16 +414,7 @@ class SkyCommand : TabExecutor {
             p0.tpIsland(island)
         } else {
             p0.sendMessage("欢迎回到主城")
-            p0.teleport(
-                Location(
-                    Bukkit.getWorld(Sky.WORLD),
-                    359.0,
-                    109.0,
-                    295.0,
-                    180f,
-                    0f
-                )
-            )
+            p0.teleport(Spawn)
         }
         SoundPlayer.playCat(p0)
         return true

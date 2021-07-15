@@ -6,6 +6,7 @@ import `fun`.fifu.fifusky.listeners.function.FiFuItems
 import `fun`.fifu.fifusky.operators.SkyOperator.addMember
 import `fun`.fifu.fifusky.operators.SkyOperator.build
 import `fun`.fifu.fifusky.operators.SkyOperator.getIsland
+import `fun`.fifu.fifusky.operators.SkyOperator.isFiFuAdmin
 import `fun`.fifu.fifusky.operators.SkyOperator.isSkyWorld
 import `fun`.fifu.fifusky.operators.SkyOperator.removeMember
 import org.bukkit.Bukkit
@@ -14,7 +15,9 @@ import org.bukkit.command.CommandSender
 import org.bukkit.command.TabExecutor
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import kotlin.reflect.full.*
+import kotlin.reflect.full.companionObject
+import kotlin.reflect.full.companionObjectInstance
+import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.javaType
 
 /**
@@ -59,8 +62,8 @@ class AdminCommand : TabExecutor {
             p3:${p3.contentToString()}
         """.trimIndent()
         )
-        if (p0 !is Player || !p0.isOp) {
-            p0.sendMessage("你必须是一名管理员级别的玩家")
+        if (p0 !is Player || !p0.isFiFuAdmin()) {
+            p0.sendMessage("你必须是FiFu管理员才能在游戏内使用此命令")
             return true
         }
         if (p3.isNullOrEmpty()) return onHelp(p0, p3)
@@ -77,6 +80,7 @@ class AdminCommand : TabExecutor {
                 "get-item" -> onGetItem(p0, p3)
                 "view-player-inventory" -> onViewPlayerInventory(p0, p3)
                 "view-player-ender-chest" -> onViewPlayerEnderChest(p0, p3)
+                "test" -> onTest(p0, p3)
                 else -> false
             }
             if (!re) onHelp(p0, arrayOf("help", p3[0]))
@@ -88,6 +92,10 @@ class AdminCommand : TabExecutor {
         }
         return true
 
+    }
+
+    private fun onTest(p0: Player, p3: Array<out String>): Boolean {
+        return true
     }
 
     private fun onViewPlayerEnderChest(p0: Player, p3: Array<out String>): Boolean {

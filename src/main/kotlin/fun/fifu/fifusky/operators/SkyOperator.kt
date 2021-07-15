@@ -3,10 +3,7 @@ package `fun`.fifu.fifusky.operators
 import `fun`.fifu.fifusky.FiFuSky
 import `fun`.fifu.fifusky.Island
 import `fun`.fifu.fifusky.Sky
-import `fun`.fifu.fifusky.data.IslandData
-import `fun`.fifu.fifusky.data.Jsoner
-import `fun`.fifu.fifusky.data.PlayerData
-import `fun`.fifu.fifusky.data.SQLiteer
+import `fun`.fifu.fifusky.data.*
 import cn.hutool.core.date.DateUtil
 import org.apache.commons.lang.time.DateUtils
 import org.bukkit.*
@@ -21,6 +18,16 @@ import org.bukkit.scheduler.BukkitRunnable
  * @author NekokeCore
  */
 object SkyOperator {
+    val Spawn = Location(
+        Bukkit.getWorld(Sky.WORLD),
+        359.0,
+        109.0,
+        295.0,
+        180f,
+        0f
+    )
+
+    private const val SpawnProtectionRadius = 3
 
     /**
      * 把玩家传送至某岛屿
@@ -485,6 +492,19 @@ object SkyOperator {
         if (!world.isSkyWorld()) return false
         if (Sky.isInIsland(blockX, blockZ, Sky.SPAWN)) return true
         return false
+    }
+
+    /**
+     * 判断玩家是否为FiFuAdmin
+     * @return true：是    false：不是
+     */
+    fun Player.isFiFuAdmin() = Jsoner.judUUIDisFiFuAdmin(uniqueId.toString())
+
+    /**
+     * 判断实体是否在保护区内
+     */
+    fun Entity.inProtectionRadius(): Boolean {
+        return location.distance(Spawn) <= SpawnProtectionRadius
     }
 
 }
