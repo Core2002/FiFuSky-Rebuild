@@ -15,7 +15,7 @@ repositories {
     maven { url 'https://mirrors.huaweicloud.com/repository/maven' }
     maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
     //Minecraft
-    maven { url 'http://crystal.lss233.com.aslf.top/repositories/minecraft' }
+    maven { url 'https://crystal.lss233.com.aslf.top/repositories/minecraft' }
     maven { url 'https://lss233.com/artifactory/minecraft' }
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
 
@@ -33,10 +33,10 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 
-    //implementation 'org.bukkit:bukkit:1.16.2-R0.1-SNAPSHOT'
+    implementation 'io.papermc.paper:paper-api:1.17.1-R0.1-SNAPSHOT'
     compileOnly 'org.projectlombok:lombok:1.18.8'
 
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+//    compile fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'cn.hutool:hutool-all:5.5.9'
 
 
