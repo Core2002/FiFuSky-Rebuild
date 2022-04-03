@@ -13,46 +13,26 @@ import org.bukkit.event.block.BlockFormEvent
 class Minerals : Listener {
     private fun getBlock(m: Material, b: Int): Material {
         val minerals = (Math.random() * 100).toInt()
-        var chufalv = 45
-        chufalv += b
+        val chufalv = 45 + b
         if (minerals <= chufalv) {
             var luck = (Math.random() * 100).toInt()
             if (chufalv > 80 && luck > 80) {
                 luck = (Math.random() * 80).toInt()
             }
-            // System.out.println("shuakuang=true,luck=" + luck);
-            if (luck in 21..34) { // 煤炭
-                return Material.COAL_ORE
-            } else {
-                if (luck in 35..44) { // 红石
-                    return Material.REDSTONE_ORE
-                } else {
-                    if (luck in 45..47) { // 铁
-                        return Material.IRON_ORE
-                    } else {
-                        if (luck in 48..49) { // 金
-                            return Material.GOLD_ORE
-                        } else {
-                            if (luck == 50) { // 钻石
-                                return Material.DIAMOND_ORE
-                            } else {
-                                if (luck in 51..52) { // 青金石
-                                    return Material.LAPIS_ORE
-                                } else {
-                                    if (luck in 53..56) { // 绿宝石
-                                        return Material.EMERALD_ORE
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+
+            return when (luck) {
+                in 21..34 -> Material.COAL_ORE // 煤炭
+                in 35..44 -> Material.REDSTONE_ORE // 红石
+                in 45..47 -> Material.IRON_ORE // 铁
+                in 48..49 -> Material.GOLD_ORE // 金
+                50 -> Material.DIAMOND_ORE // 钻石
+                in 51..52 -> Material.LAPIS_ORE // 青金石
+                in 53..56 -> Material.EMERALD_ORE // 绿宝石
+                else -> m
             }
         } else {
-            // System.out.println("shuakuang=false");
             return m
         }
-        return m
     }
 
     @EventHandler
