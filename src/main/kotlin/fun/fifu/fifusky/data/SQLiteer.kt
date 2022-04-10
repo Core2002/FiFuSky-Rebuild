@@ -49,9 +49,7 @@ object SQLiteer {
         return if (temp.isNotEmpty()) {
             val ownerPlayersData = getPlayersData(temp[0].getStr("OwnersList").toString())
             val memberPlayersData = getPlayersData(temp[0].getStr("MembersList").toString())
-
             val privilegeData = PrivilegeData(island, ownerPlayersData, memberPlayersData)
-
             IslandData(island, privilegeData)
         } else {
             IslandData(island, PrivilegeData(island, ArrayList(), ArrayList()))
