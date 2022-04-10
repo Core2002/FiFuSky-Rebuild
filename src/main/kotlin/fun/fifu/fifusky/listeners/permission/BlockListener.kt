@@ -121,4 +121,21 @@ class BlockListener : Listener {
             event.isCancelled = true
         }
     }
+
+    /**
+     * 当一个活塞臂推出时触发.
+     *
+     * @param event
+     */
+    @EventHandler
+    fun onBlockPistonExtend(event: BlockPistonExtendEvent) {
+        if (!event.block.world.isSkyWorld()) return
+        event.blocks.forEach {
+            if (Sky.isInIsland(it.x, it.z, Sky.SPAWN)) {
+                event.isCancelled = true
+                return
+            }
+        }
+    }
+
 }
