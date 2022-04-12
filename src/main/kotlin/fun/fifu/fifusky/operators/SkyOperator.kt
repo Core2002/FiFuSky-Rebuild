@@ -504,6 +504,7 @@ object SkyOperator {
      * 判断实体是否在保护区内
      */
     fun Entity.inProtectionRadius(): Boolean {
+        if (!location.world.isSkyWorld()) return false
         return location.distance(Spawn) <= SpawnProtectionRadius
     }
 
