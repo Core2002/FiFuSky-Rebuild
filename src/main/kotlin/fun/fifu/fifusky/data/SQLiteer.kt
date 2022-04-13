@@ -3,9 +3,11 @@ package `fun`.fifu.fifusky.data
 import `fun`.fifu.fifusky.Island
 import `fun`.fifu.fifusky.Sky
 import cn.hutool.db.Db
+import cn.hutool.db.DbUtil
 import cn.hutool.db.Entity
 import cn.hutool.json.JSONArray
 import cn.hutool.json.JSONUtil
+import java.io.File
 import java.util.*
 
 /**
@@ -37,6 +39,10 @@ object SQLiteer {
     private const val ChunkData = "ChunkData"
     private const val PlayerData = "PlayerData"
     private const val SkyIsLand = "SkyIsLand"
+
+    init {
+        DbUtil.setCustomizeDbSettingPath(File(File(javaClass.protectionDomain.codeSource.location.path).absoluteFile.parentFile.path+"/FiFuSky/db.setting").absoluteFile.path);
+    }
 
 
     /**

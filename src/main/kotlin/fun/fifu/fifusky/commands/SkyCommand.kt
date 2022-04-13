@@ -118,7 +118,7 @@ class SkyCommand : TabExecutor {
             p0.sendMessage("你必须是一名玩家")
             return true
         }
-        if (p3.isNullOrEmpty()) return onS(p0)
+        if (p3.isEmpty()) return onS(p0)
         try {
             if (!p0.world.isSkyWorld() && !arrayOf("help", "?", "homes", "go", "tpa").contains(p3[0])) {
                 p0.sendMessage("你必须在空岛世界才能使用这条命令")
@@ -398,7 +398,7 @@ class SkyCommand : TabExecutor {
                 val xx = Random.nextInt(-Sky.MAX_ISLAND * Sky.SIDE, Sky.MAX_ISLAND * Sky.SIDE + 1)
                 val zz = Random.nextInt(-Sky.MAX_ISLAND * Sky.SIDE, Sky.MAX_ISLAND * Sky.SIDE + 1)
                 temp = Sky.getIsland(xx, zz)
-            } while (!SQLiteer.getIsLandData(temp).Privilege.Owner.isNullOrEmpty())
+            } while (!SQLiteer.getIsLandData(temp).Privilege.Owner.isEmpty())
 
             temp.build()
 

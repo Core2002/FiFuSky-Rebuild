@@ -53,7 +53,7 @@ object Jsoner {
      */
     fun getPlayerLastGet(uuid: String): Long {
         val obj = JSONUtil.parseObj(String(cache.getFileBytes(PlayerLastGet)))
-        if (uuid in obj) {
+        if (uuid in obj.keys) {
             return obj[uuid].toString().toLong()
         }
         return 0L
