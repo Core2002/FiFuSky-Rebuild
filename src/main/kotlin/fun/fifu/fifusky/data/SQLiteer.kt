@@ -41,7 +41,7 @@ object SQLiteer {
     private const val SkyIsLand = "SkyIsLand"
 
     init {
-        DbUtil.setCustomizeDbSettingPath(File(File(javaClass.protectionDomain.codeSource.location.path).absoluteFile.parentFile.path+"/FiFuSky/db.setting").absoluteFile.path);
+        DbUtil.setDbSettingPathGlobal(File(File(javaClass.protectionDomain.codeSource.location.path).absoluteFile.parentFile.path+"/FiFuSky/db.setting").absoluteFile.path);
     }
 
 

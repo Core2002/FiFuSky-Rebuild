@@ -11,7 +11,7 @@ url = jdbc:sqlite:plugins/FiFuSky/FiFuSky.db
 # driver = com.mysql.jdbc.Driver
 ## 可选配置
 # 是否在日志中显示执行的SQL
-showSql = true
+showSql = false
 # 是否格式化显示的SQL
 formatSql = true
 # 是否显示SQL参数
