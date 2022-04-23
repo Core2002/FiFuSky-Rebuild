@@ -17,10 +17,12 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.event.entity.EntityExplodeEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.inventory.InventoryOpenEvent
-import org.bukkit.inventory.*
+import org.bukkit.inventory.CraftingInventory
+import org.bukkit.inventory.EnchantingInventory
+import org.bukkit.inventory.MerchantInventory
+import org.bukkit.inventory.PlayerInventory
 import org.bukkit.util.io.BukkitObjectOutputStream
 import java.io.ByteArrayOutputStream
-import java.io.IOException
 
 /**
  * 权限组：实体类权限处理
@@ -138,49 +140,25 @@ class EntityListener : Listener {
      */
     @EventHandler
     fun onPickup(entityPickupItemEvent: EntityPickupItemEvent) {
-        val itemStack = entityPickupItemEvent.item.itemStack
-        try {
-            val byteArrayOutputStream1 = ByteArrayOutputStream()
-            val bukkitObjectOutputStream = BukkitObjectOutputStream(byteArrayOutputStream1)
-            bukkitObjectOutputStream.writeObject(itemStack)
-            bukkitObjectOutputStream.close()
-            var player: Player? = null
-            var isPlayer = false
-            if (entityPickupItemEvent.entity is Player) {
-                player = entityPickupItemEvent.entity as Player
-                isPlayer = true
-            }
-            val invSize = if (player == null) {
-                10000
-            } else {
-                try {
-                    val byteArrayOutputStream = ByteArrayOutputStream()
-                    val data = BukkitObjectOutputStream(byteArrayOutputStream)
-                    data.writeObject(player.inventory.contents)
-                    data.close()
-                    byteArrayOutputStream.close()
-                    byteArrayOutputStream.toByteArray().size
-                } catch (ioException: IOException) {
-                    ioException.printStackTrace()
-                    5000
-                }
-            }
-            val itemSize = byteArrayOutputStream1.toByteArray().size
-            byteArrayOutputStream1.close()
-            val maxSize = 1000000
-            if (itemSize + invSize > maxSize) {
-                if (isPlayer) {
-                    player!!.sendMessage(
-                        ChatColor.translateAlternateColorCodes(
-                            '&',
-                            "&8&l(&c&l!&8&l) &c你试图捡起的这个物品要素过多，为了安全起见，不能被捡起。"
-                        )
-                    )
-                }
-                entityPickupItemEvent.isCancelled = true
-            }
-        } catch (ioException: IOException) {
-            ioException.printStackTrace()
+        val player = entityPickupItemEvent.entity
+        if (player !is Player) return
+        val maxSize = 2097152
+
+        val itemStackOutputStream = ByteArrayOutputStream()
+        BukkitObjectOutputStream(itemStackOutputStream).use { it.writeObject(entityPickupItemEvent.item.itemStack) }
+
+        val playerInvOutputStream = ByteArrayOutputStream()
+        BukkitObjectOutputStream(playerInvOutputStream).use { it.writeObject(player.inventory) }
+
+        val itemSize = itemStackOutputStream.toByteArray().size
+        val invSize = playerInvOutputStream.toByteArray().size
+
+        itemStackOutputStream.close()
+        playerInvOutputStream.close()
+
+        if (itemSize + invSize >= maxSize) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&c你试图捡起的这个物品要素过多，为了安全起见，不能被捡起。"))
+            entityPickupItemEvent.isCancelled = true
         }
     }
 
