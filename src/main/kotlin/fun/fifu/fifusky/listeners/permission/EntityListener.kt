@@ -148,7 +148,7 @@ class EntityListener : Listener {
         BukkitObjectOutputStream(itemStackOutputStream).use { it.writeObject(entityPickupItemEvent.item.itemStack) }
 
         val playerInvOutputStream = ByteArrayOutputStream()
-        BukkitObjectOutputStream(playerInvOutputStream).use { it.writeObject(player.inventory) }
+        BukkitObjectOutputStream(playerInvOutputStream).use { it.writeObject(player.inventory.contents) }
 
         val itemSize = itemStackOutputStream.toByteArray().size
         val invSize = playerInvOutputStream.toByteArray().size
