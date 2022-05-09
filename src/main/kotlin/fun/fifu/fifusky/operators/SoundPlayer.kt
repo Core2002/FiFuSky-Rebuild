@@ -6,10 +6,13 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 /**
- * 声音播放器单例
+ * 小猫的声音播放器单例
  * @author NekokeCore
  */
 object SoundPlayer {
+    /**
+     * 很多的小猫的声音的列表
+     */
     var catList = ArrayList<Sound>()
 
     init {
@@ -25,10 +28,18 @@ object SoundPlayer {
         catList.add(Sound.ENTITY_CAT_STRAY_AMBIENT)
     }
 
+    /**
+     * 播放小猫的声音
+     * @param player 播放给某玩家
+     */
     fun playCat(player: Player) {
         player.playSound(player.location, extact(catList), 10f, 10f)
     }
 
+    /**
+     * 确定播放小猫的声音
+     * @param arrayList 声音列表
+     */
     private fun extact(arrayList: ArrayList<Sound>): Sound {
         val r = Random(1)
         val temp: Int = r.nextInt(arrayList.size)
