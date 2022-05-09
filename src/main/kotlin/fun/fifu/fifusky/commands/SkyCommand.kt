@@ -426,9 +426,7 @@ class SkyCommand : TabExecutor {
      */
     private fun getCAPTCHA(): String {
         val sb = StringBuilder()
-        for (x in 1..8) {
-            sb.append(pc.random())
-        }
+        for (x in 1..8) sb.append(pc.random())
         return sb.toString()
     }
 
