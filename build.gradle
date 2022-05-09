@@ -26,16 +26,16 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.20'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.21'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1-native-mt'
-    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.6.20'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect:1.6.21'
 
-    testImplementation 'org.jetbrains.kotlin:kotlin-reflect:1.6.20'
+    testImplementation 'org.jetbrains.kotlin:kotlin-reflect:1.6.21'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 
     compileOnly 'io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT'
-    compileOnly 'org.projectlombok:lombok:1.18.22'
+    compileOnly 'org.projectlombok:lombok:1.18.24'
 
 //    implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'cn.hutool:hutool-all:5.8.0.M3'
