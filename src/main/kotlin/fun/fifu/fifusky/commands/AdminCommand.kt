@@ -66,7 +66,7 @@ class AdminCommand : TabExecutor {
             p0.sendMessage("你必须是FiFu管理员才能在游戏内使用此命令")
             return true
         }
-        if (p3.isNullOrEmpty()) return onHelp(p0, p3)
+        if (p3.isEmpty()) return onHelp(p0, p3)
         try {
             if (!p0.world.isSkyWorld()) {
                 p0.sendMessage("你必须在空岛世界才能使用这条命令")
