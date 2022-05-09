@@ -12,6 +12,9 @@ import org.bukkit.scheduler.BukkitRunnable
  * @author NekokeCore
  */
 object Tpaer {
+    /**
+     * 存储所有的tpa请求，方向是从左往右，重启后清空，用完清空，超时清空
+     */
     var tpaRequest: MutableMap<String, String> = HashMap()
 
     fun tpa(from: Player, goto: Player = from) {
