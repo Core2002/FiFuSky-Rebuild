@@ -19,6 +19,9 @@ class FiFuSky : JavaPlugin() {
         lateinit var fs: FiFuSky
     }
 
+    /**
+     * 插件加载后的初始化
+     */
     override fun onLoad() {
         fs = this
         if (!File("plugins/FiFuSky").isDirectory) {
@@ -27,6 +30,9 @@ class FiFuSky : JavaPlugin() {
         }
     }
 
+    /**
+     * 插件启动后的初始化
+     */
     override fun onEnable() {
         //注册命令
         Bukkit.getPluginCommand("s")?.setExecutor(SkyCommand())
@@ -48,6 +54,9 @@ class FiFuSky : JavaPlugin() {
         logger.info("FiFu空岛插件已启动！")
     }
 
+    /**
+     * 注册该监听器
+     */
     private fun Listener.register() {
         server.pluginManager.registerEvents(this, this@FiFuSky)
         logger.info("监听器 ${this.javaClass.simpleName} 注册完毕")
