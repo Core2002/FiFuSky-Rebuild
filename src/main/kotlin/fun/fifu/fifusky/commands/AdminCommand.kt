@@ -28,7 +28,7 @@ class AdminCommand : TabExecutor {
     private val fiFuItems = mutableListOf<String>()
 
     private val helpMassage = mapOf(
-        "build-island" to "/fs-admin build-island <Skyloc> 来build一个岛",
+        "build-island" to "/fs-admin build-island <SkyLoc> 来build一个岛",
         "make-member" to "/fs-admin make-member 将自己纳入该岛屿的成员",
         "exit-member" to "/fs-admin exit-member 将自己退出该岛屿成员",
         "get-item" to "/fs-admin get-item <FiFuItem> 获得FiFuItem",
