@@ -398,7 +398,7 @@ class SkyCommand : TabExecutor {
                 val xx = Random.nextInt(-Sky.MAX_ISLAND * Sky.SIDE, Sky.MAX_ISLAND * Sky.SIDE + 1)
                 val zz = Random.nextInt(-Sky.MAX_ISLAND * Sky.SIDE, Sky.MAX_ISLAND * Sky.SIDE + 1)
                 temp = Sky.getIsland(xx, zz)
-            } while (!SQLiteer.getIsLandData(temp).Privilege.Owner.isEmpty())
+            } while (SQLiteer.getIsLandData(temp).Privilege.Owner.isNotEmpty())
 
             temp.build()
 

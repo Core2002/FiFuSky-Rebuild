@@ -38,7 +38,7 @@ object Sky {
      * @param skyLoc 岛坐标元组
      * @return 岛屿对象
      */
-    fun getIsland(skyLoc: Pair<Int, Int>): Island{
+    fun getIsland(skyLoc: Pair<Int, Int>): Island {
         if (abs(skyLoc.first) > MAX_ISLAND || abs(skyLoc.second) > MAX_ISLAND)
             throw  java.lang.RuntimeException("SkyLoc 不合法！  ->  $skyLoc")
         return Island(skyLoc, getR(skyLoc.first), getRR(skyLoc.first), getR(skyLoc.second), getRR(skyLoc.second))
@@ -88,14 +88,12 @@ object Sky {
         if (rr > 0) {
             while (rr !in getR(skyR)..getRR(skyR)) {
                 skyR++
-                if (abs(skyR) > MAX_ISLAND)
-                    throw RuntimeException("R轴SkyLoc正越界！SkyR=$skyR ,rr=$rr")
+                if (abs(skyR) > MAX_ISLAND) throw RuntimeException("R轴SkyLoc正越界！SkyR=$skyR ,rr=$rr")
             }
         } else if (rr < 0) {
             while (rr !in getR(skyR)..getRR(skyR)) {
                 skyR--
-                if (abs(skyR) > MAX_ISLAND)
-                    throw RuntimeException("R轴SkyLoc负越界！SkyR=$skyR ,rr=$rr")
+                if (abs(skyR) > MAX_ISLAND) throw RuntimeException("R轴SkyLoc负越界！SkyR=$skyR ,rr=$rr")
             }
         }
         return skyR
