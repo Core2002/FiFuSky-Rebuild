@@ -2,11 +2,30 @@ plugins {
     id 'java'
     id 'org.jetbrains.kotlin.jvm' version '1.6.20'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
-//    id 'application'
+    id 'maven-publish'
 }
 
 group 'fun.fifu.fifusky'
 version '1.0-SNAPSHOT'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId group
+            artifactId rootProject.name
+            version version
+
+            from components.java
+            artifact kotlinSourcesJar
+//            artifact javadocJar
+            // more goes in here
+        }
+    }
+
+    repositories {
+        mavenLocal()
+    }
+}
 
 repositories {
     mavenLocal()

@@ -20,6 +20,13 @@ object Sky {
     private fun getRR(SkyR: Int): Int = SIDE * (SkyR + 1) - 1
 
     /**
+     * 获取指定坐标所在的岛屿坐标
+     * @param rr 指定的坐标
+     * @return 其所在的岛屿坐标
+     */
+    private fun getSkyR(rr: Int) = if (rr >= 0) rr / SIDE else -((-rr + SIDE - 1) / SIDE)
+
+    /**
      * 把岛坐标字符串转化成坐标元组
      * @param skyLoc 岛坐标字符串
      * @return 岛坐标元组
@@ -77,26 +84,5 @@ object Sky {
      */
     fun isInIsland(xx: Int, zz: Int, island: Island) =
         xx in island.X..island.XX && zz in island.Y..island.YY
-
-    /**
-     * 获取指定坐标所在的岛屿坐标
-     * @param rr 指定的坐标
-     * @return 其所在的岛屿坐标
-     */
-    private fun getSkyR(rr: Int): Int {
-        var skyR = 0
-        if (rr > 0) {
-            while (rr !in getR(skyR)..getRR(skyR)) {
-                skyR++
-                if (abs(skyR) > MAX_ISLAND) throw RuntimeException("R轴SkyLoc正越界！SkyR=$skyR ,rr=$rr")
-            }
-        } else if (rr < 0) {
-            while (rr !in getR(skyR)..getRR(skyR)) {
-                skyR--
-                if (abs(skyR) > MAX_ISLAND) throw RuntimeException("R轴SkyLoc负越界！SkyR=$skyR ,rr=$rr")
-            }
-        }
-        return skyR
-    }
 
 }
