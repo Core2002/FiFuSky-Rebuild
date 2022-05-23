@@ -230,8 +230,8 @@ class SkyCommand : TabExecutor {
     }
 
     private fun onRenounce(p0: Player, p3: Array<out String>): Boolean {
-        val isLand = p0.currentIsland()
-        if (!p0.isOwnedIsland(isLand)) {
+        val island = p0.currentIsland()
+        if (!p0.isOwnedIsland(island)) {
             p0.sendMessage("你不是该岛屿的所有者，无权操作")
             return false
         }
@@ -239,8 +239,8 @@ class SkyCommand : TabExecutor {
         val islandNum = p0.getIslandHomes().first.split(' ').size
         if (canGet.first || islandNum > 1) {
             if (p3.size == 2 && p3[1] == lruCache[p0.uniqueId]) {
-                isLand.removeOwner(p0)
-                p0.sendMessage("操作完毕，玩家 ${p0.name} 放弃了岛屿 $isLand ")
+                island.removeOwner(p0)
+                p0.sendMessage("操作完毕，玩家 ${p0.name} 放弃了岛屿 $island ")
             } else {
                 val captcha = getCAPTCHA()
                 lruCache.put(p0.uniqueId, captcha)
@@ -267,21 +267,21 @@ class SkyCommand : TabExecutor {
             p0.sendMessage("玩家 ${p3[1]} 不在线，无法操作")
             return true
         }
-        val isLand = p0.currentIsland()
-        if (!p0.isOwnedIsland(isLand)) {
+        val island = p0.currentIsland()
+        if (!p0.isOwnedIsland(island)) {
             p0.sendMessage("你不是该岛屿的所有者，无权操作")
             return false
         }
         val memberUuid = member.uniqueId.toString()
-        val isLandData = SQLiteer.getIsLandData(isLand)
+        val islandData = SQLiteer.getIslandData(island)
         val playerData = PlayerData(memberUuid, member.name)
-        val mems = isLandData.Privilege.Member
+        val mems = islandData.Privilege.Member
         if (playerData in mems) {
             mems.remove(playerData)
-            p0.sendMessage("操作完毕，已将成员 ${member.name} 从岛屿 $isLand 移除")
-            SQLiteer.saveIslandData(isLandData)
+            p0.sendMessage("操作完毕，已将成员 ${member.name} 从岛屿 $island 移除")
+            SQLiteer.saveIslandData(islandData)
         } else {
-            p0.sendMessage("玩家 ${member.name} 不是岛 $isLand 的成员")
+            p0.sendMessage("玩家 ${member.name} 不是岛 $island 的成员")
         }
         return true
     }
@@ -293,43 +293,43 @@ class SkyCommand : TabExecutor {
             p0.sendMessage("玩家 ${p3[1]} 不在线，无法操作")
             return true
         }
-        val isLand = p0.currentIsland()
-        if (!p0.isOwnedIsland(isLand)) {
+        val island = p0.currentIsland()
+        if (!p0.isOwnedIsland(island)) {
             p0.sendMessage("你不是该岛屿的所有者，无权操作")
             return false
         }
         val memberUuid = member.uniqueId.toString()
-        val isLandData = SQLiteer.getIsLandData(isLand)
+        val islandData = SQLiteer.getIslandData(island)
         val playerData = PlayerData(memberUuid, member.name)
-        val mems = isLandData.Privilege.Member
+        val mems = islandData.Privilege.Member
         if (playerData in mems) {
-            p0.sendMessage("玩家 ${member.name} 已经是岛 $isLand 的成员")
+            p0.sendMessage("玩家 ${member.name} 已经是岛 $island 的成员")
             return true
         } else {
             mems.add(playerData)
         }
-        SQLiteer.saveIslandData(isLandData)
-        p0.sendMessage("操作完毕，已将成员 ${member.name} 添加到岛屿 $isLand")
+        SQLiteer.saveIslandData(islandData)
+        p0.sendMessage("操作完毕，已将成员 ${member.name} 添加到岛屿 $island")
         return true
     }
 
     private fun onGo(p0: Player, p3: Array<out String>): Boolean {
         if (p3.size == 1) return false
-        val isLand = Sky.getIsland(p3[1])
-        if (isLand.isUnclaimed()) {
-            p0.sendMessage("没有 $isLand 这个岛屿")
+        val island = Sky.getIsland(p3[1])
+        if (island.isUnclaimed()) {
+            p0.sendMessage("没有 $island 这个岛屿")
             return true
         } else {
-            p0.tpIsland(isLand)
+            p0.tpIsland(island)
         }
         return true
     }
 
     private fun onHomes(p0: Player): Boolean {
-        val isLand = Sky.getIsland(p0.location.blockX, p0.location.blockZ)
+        val island = Sky.getIsland(p0.location.blockX, p0.location.blockZ)
         val homes = p0.getIslandHomes()
         val homeInfo = """
-            ${p0.name} 现在所在的岛屿的SkyLoc是 $isLand
+            ${p0.name} 现在所在的岛屿的SkyLoc是 $island
             你拥有的岛屿有：
             ${homes.first}
             你加入的岛屿有：
@@ -341,17 +341,17 @@ class SkyCommand : TabExecutor {
 
     private fun onInfo(p0: Player, p3: Array<out String>): Boolean {
         val u = p3.size > 1 && p3[1] == "u"
-        val isLand = Sky.getIsland(p0.location.blockX, p0.location.blockZ)
+        val island = Sky.getIsland(p0.location.blockX, p0.location.blockZ)
         val info = """
-            ${p0.name} 现在所在的岛屿的SkyLoc是 $isLand
-            该岛屿的X：${isLand.X}
-            该岛屿的XX：${isLand.XX}
-            该岛屿的Y：${isLand.Y}
-            该岛屿的YY：${isLand.YY}
+            ${p0.name} 现在所在的岛屿的SkyLoc是 $island
+            该岛屿的X：${island.X}
+            该岛屿的XX：${island.XX}
+            该岛屿的Y：${island.Y}
+            该岛屿的YY：${island.YY}
             该岛屿的主人有：
-            ${isLand.getOwnersList(u)}
+            ${island.getOwnersList(u)}
             该岛屿的成员有：
-            ${isLand.getMembersList(u)}
+            ${island.getMembersList(u)}
             您在此岛屿 ${if (p0.havePermission()) "有" else "没有"} 权限
         """.trimIndent()
         p0.sendMessage(info)
@@ -364,14 +364,14 @@ class SkyCommand : TabExecutor {
             player.sendMessage("每两个月只能领取一次岛，${player.canGetIsland().second}后可再次领取")
             return true
         }
-        val isLand = Sky.getIsland(p3[1])
-        if (isLand.isUnclaimed()) {
-            isLand.build()
-            isLand.addOwner(player)
-            SkyOperator.playerGetOver(player, isLand.getIslandData())
-            player.tpIsland(isLand)
+        val island = Sky.getIsland(p3[1])
+        if (island.isUnclaimed()) {
+            island.build()
+            island.addOwner(player)
+            SkyOperator.playerGetOver(player, island.getIslandData())
+            player.tpIsland(island)
         } else {
-            player.sendMessage("岛屿 $isLand 已经有人领过了，主人是${isLand.getOwnersList()}")
+            player.sendMessage("岛屿 $island 已经有人领过了，主人是${island.getOwnersList()}")
         }
         return true
     }
@@ -398,11 +398,11 @@ class SkyCommand : TabExecutor {
                 val xx = Random.nextInt(-Sky.MAX_ISLAND * Sky.SIDE, Sky.MAX_ISLAND * Sky.SIDE + 1)
                 val zz = Random.nextInt(-Sky.MAX_ISLAND * Sky.SIDE, Sky.MAX_ISLAND * Sky.SIDE + 1)
                 temp = Sky.getIsland(xx, zz)
-            } while (SQLiteer.getIsLandData(temp).Privilege.Owner.isNotEmpty())
+            } while (SQLiteer.getIslandData(temp).Privilege.Owner.isNotEmpty())
 
             temp.build()
 
-            val iLD = SQLiteer.getIsLandData(temp)
+            val iLD = SQLiteer.getIslandData(temp)
             iLD.Privilege.Owner.add(PlayerData(p0.uniqueId.toString(), p0.name))
             SkyOperator.playerGetOver(p0, iLD)
             temp

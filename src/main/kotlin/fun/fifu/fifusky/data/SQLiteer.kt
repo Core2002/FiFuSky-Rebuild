@@ -38,7 +38,7 @@ object SQLiteer {
 
     private const val ChunkData = "ChunkData"
     private const val PlayerData = "PlayerData"
-    private const val SkyIsLand = "SkyIsLand"
+    private const val SkyIsland = "SkyIsland"
 
     init {
         DbUtil.setDbSettingPathGlobal(File(File(javaClass.protectionDomain.codeSource.location.path).absoluteFile.parentFile.path+"/FiFuSky/db.setting").absoluteFile.path);
@@ -50,8 +50,8 @@ object SQLiteer {
      * @param island 岛屿
      * @return 岛屿信息
      */
-    fun getIsLandData(island: Island): IslandData {
-        val temp = Db.use().findAll(Entity.create(SkyIsLand).set("SkyLoc", island.toString()))
+    fun getIslandData(island: Island): IslandData {
+        val temp = Db.use().findAll(Entity.create(SkyIsland).set("SkyLoc", island.toString()))
         return if (temp.isNotEmpty()) {
             val ownerPlayersData = getPlayersData(temp[0].getStr("OwnersList").toString())
             val memberPlayersData = getPlayersData(temp[0].getStr("MembersList").toString())
@@ -66,13 +66,13 @@ object SQLiteer {
     /**
      * 把玩家主岛存入数据库
      * @param playerUUID 玩家UUID
-     * @param playerIsLand 玩家主岛
+     * @param playerIsland 玩家主岛
      */
-    fun savePlayerIndex(playerUUID: String, playerIsLand: String) {
+    fun savePlayerIndex(playerUUID: String, playerIsland: String) {
 //        val string = String(FileCache.getFileBytes(playersIndex))
 //        val dataObj = JSONUtil.parseObj(string)
 //
-//        dataObj[playerUUID] = playerIsLand
+//        dataObj[playerUUID] = playerIsland
 //
 //        File(playersIndex).writeText(dataObj.toJSONString(4))
 
@@ -81,11 +81,11 @@ object SQLiteer {
             Db.use().insert(
                 Entity.create(PlayerData)
                     .set("UUID", playerUUID)
-                    .set("IndexSkyLoc", playerIsLand)
+                    .set("IndexSkyLoc", playerIsland)
             )
         } else {
             Db.use().update(
-                Entity.create().set("IndexSkyLoc", playerIsLand),
+                Entity.create().set("IndexSkyLoc", playerIsland),
                 Entity.create(PlayerData).set("UUID", playerUUID)
             )
         }
@@ -102,7 +102,7 @@ object SQLiteer {
 //        val string = String(FileCache.getFileBytes(playersIndex))
 //        val dataObj = JSONUtil.parseObj(string)
 //
-//        return Sky.getIsLand(dataObj[playerUUID].toString())
+//        return Sky.getIsland(dataObj[playerUUID].toString())
 
         val temp = Db.use().findAll(Entity.create(PlayerData).set("UUID", playerUUID))
         if (temp.isNotEmpty()) {
@@ -283,9 +283,9 @@ object SQLiteer {
             savePlayerName(it.UUID, it.LastName)
         }
 
-        if (Db.use().findAll(Entity.create(SkyIsLand).set("SkyLoc", skyLoc)).isEmpty()) {
+        if (Db.use().findAll(Entity.create(SkyIsland).set("SkyLoc", skyLoc)).isEmpty()) {
             Db.use().insert(
-                Entity.create(SkyIsLand)
+                Entity.create(SkyIsland)
                     .set("SkyLoc", skyLoc)
                     .set("OwnersList", ownersList.toString())
                     .set("MembersList", membersList.toString())
@@ -296,7 +296,7 @@ object SQLiteer {
                     .set("SkyLoc", skyLoc)
                     .set("OwnersList", ownersList.toString())
                     .set("MembersList", membersList.toString()),
-                Entity.create(SkyIsLand).set("SkyLoc", skyLoc)
+                Entity.create(SkyIsland).set("SkyLoc", skyLoc)
             )
         }
     }
@@ -344,12 +344,12 @@ object SQLiteer {
     fun getHomes(uuid: String): Pair<ArrayList<IslandData>, ArrayList<IslandData>> {
         val forOwner = ArrayList<IslandData>()
         val forMember = ArrayList<IslandData>()
-        val temp = Db.use().findAll(SkyIsLand)
+        val temp = Db.use().findAll(SkyIsland)
         if (temp.isNotEmpty()) {
             temp.forEach { entity ->
-                val isLandData = getIsLandData(Sky.getIsland(entity.getStr("SkyLoc")))
-                isLandData.Privilege.Owner.forEach { if (uuid == it.UUID) forOwner.add(isLandData) }
-                isLandData.Privilege.Member.forEach { if (uuid == it.UUID) forMember.add(isLandData) }
+                val islandData = getIslandData(Sky.getIsland(entity.getStr("SkyLoc")))
+                islandData.Privilege.Owner.forEach { if (uuid == it.UUID) forOwner.add(islandData) }
+                islandData.Privilege.Member.forEach { if (uuid == it.UUID) forMember.add(islandData) }
             }
         }
         return Pair(forOwner, forMember)
@@ -360,7 +360,7 @@ object SQLiteer {
      * @return 所有的岛屿（可变列表）
      */
     fun getAllSkyLoc(): MutableList<Island> {
-        val temp = Db.use().findAll(Entity.create(SkyIsLand))
+        val temp = Db.use().findAll(Entity.create(SkyIsland))
         val r = mutableListOf<Island>()
         temp.forEach {
             r.add(Sky.getIsland(it.getStr("SkyLoc")))

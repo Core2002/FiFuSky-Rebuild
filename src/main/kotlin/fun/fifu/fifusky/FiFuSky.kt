@@ -50,7 +50,7 @@ class FiFuSky : JavaPlugin() {
             }
         }
 
-        logger.info(SQLiteer.getIsLandData(Sky.getIsland("(0,0)")).toString())
+        logger.info(SQLiteer.getIslandData(Sky.getIsland("(0,0)")).toString())
         logger.info("FiFu空岛插件已启动！")
     }
 

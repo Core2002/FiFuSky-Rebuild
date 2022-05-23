@@ -34,13 +34,13 @@ object SkyOperator {
      * @param island 岛屿
      */
     fun Player.tpIsland(island: Island) {
-        val isLandCenter = Sky.getIslandCenter(island)
+        val islandCenter = Sky.getIslandCenter(island)
         teleport(
             Location(
                 Bukkit.getWorld("world"),
-                isLandCenter.first.toDouble(),
+                islandCenter.first.toDouble(),
                 65.0,
-                isLandCenter.second.toDouble(),
+                islandCenter.second.toDouble(),
                 location.yaw,
                 location.pitch
             )
@@ -189,7 +189,7 @@ object SkyOperator {
         }
 
         //目标基址
-        val mb = Sky.getIsLandCenter(isLand)
+        val mb = Sky.getIslandCenter(island)
 
         //开始复制
         for ((t, b) in ib) {
@@ -283,7 +283,7 @@ object SkyOperator {
      * @return 是否无人认领
      */
     fun Island.isUnclaimed(): Boolean {
-        val privilege = SQLiteer.getIsLandData(this).Privilege
+        val privilege = SQLiteer.getIslandData(this).Privilege
         if (privilege.Owner.isNullOrEmpty())
             return true
         return false
@@ -295,7 +295,7 @@ object SkyOperator {
      */
     fun Island.getOwnersList(u: Boolean = false): String {
         val sb = StringBuilder()
-        val owner = SQLiteer.getIsLandData(this).Privilege.Owner
+        val owner = SQLiteer.getIslandData(this).Privilege.Owner
         owner.forEach {
             if (u) {
                 sb.append(it.UUID).append(' ')
@@ -312,7 +312,7 @@ object SkyOperator {
      */
     fun Island.getMembersList(u: Boolean = false): String {
         val sb = StringBuilder()
-        val owner = SQLiteer.getIsLandData(this).Privilege.Member
+        val owner = SQLiteer.getIslandData(this).Privilege.Member
         owner.forEach {
             if (u) {
                 sb.append(it.UUID).append(' ')
@@ -327,7 +327,7 @@ object SkyOperator {
      * 获取岛屿的信息
      * @return IslandData
      */
-    fun Island.getIslandData() = SQLiteer.getIsLandData(this)
+    fun Island.getIslandData() = SQLiteer.getIslandData(this)
 
     /**
      * 获取坐标所在的岛屿
@@ -341,11 +341,11 @@ object SkyOperator {
      */
     fun Island.addOwner(player: Player) {
         val uuid = player.uniqueId.toString()
-        val isLandData = SQLiteer.getIsLandData(this)
-        if (player.isOwnedIsland(isLandData.Island))
+        val islandData = SQLiteer.getIslandData(this)
+        if (player.isOwnedIsland(islandData.Island))
             return
-        isLandData.Privilege.Owner.add(PlayerData(UUID = uuid, LastName = player.name))
-        SQLiteer.saveIslandData(isLandData)
+        islandData.Privilege.Owner.add(PlayerData(UUID = uuid, LastName = player.name))
+        SQLiteer.saveIslandData(islandData)
     }
 
     /**
@@ -354,11 +354,11 @@ object SkyOperator {
      */
     fun Island.addMember(player: Player) {
         val uuid = player.uniqueId.toString()
-        val isLandData = SQLiteer.getIsLandData(this)
-        if (player.isJoinedIsland(isLandData.Island))
+        val islandData = SQLiteer.getIslandData(this)
+        if (player.isJoinedIsland(islandData.Island))
             return
-        isLandData.Privilege.Member.add(PlayerData(UUID = uuid, LastName = player.name))
-        SQLiteer.saveIslandData(isLandData)
+        islandData.Privilege.Member.add(PlayerData(UUID = uuid, LastName = player.name))
+        SQLiteer.saveIslandData(islandData)
     }
 
     /**
@@ -367,11 +367,11 @@ object SkyOperator {
      */
     fun Island.removeMember(player: Player) {
         val uuid = player.uniqueId.toString()
-        val isLandData = SQLiteer.getIsLandData(this)
-        if (!player.isJoinedIsland(isLandData.Island))
+        val islandData = SQLiteer.getIslandData(this)
+        if (!player.isJoinedIsland(islandData.Island))
             return
-        isLandData.Privilege.Member.remove(PlayerData(UUID = uuid, LastName = player.name))
-        SQLiteer.saveIslandData(isLandData)
+        islandData.Privilege.Member.remove(PlayerData(UUID = uuid, LastName = player.name))
+        SQLiteer.saveIslandData(islandData)
     }
 
     /**
@@ -421,12 +421,12 @@ object SkyOperator {
      */
     fun Island.removeOwner(player: Player) {
         val uuid = player.uniqueId.toString()
-        val isLandData = SQLiteer.getIsLandData(this)
-        if (!player.isOwnedIsland(isLandData.Island))
+        val islandData = SQLiteer.getIslandData(this)
+        if (!player.isOwnedIsland(islandData.Island))
             return
-        val owners = isLandData.Privilege.Owner
+        val owners = islandData.Privilege.Owner
         owners.remove(PlayerData(uuid, SQLiteer.getPlayerName(uuid)))
-        SQLiteer.saveIslandData(isLandData)
+        SQLiteer.saveIslandData(islandData)
     }
 
     /**
@@ -435,8 +435,8 @@ object SkyOperator {
      * @return 玩家是否是岛屿的所有者
      */
     fun Player.isOwnedIsland(island: Island): Boolean {
-        val isLandData = SQLiteer.getIsLandData(island)
-        isLandData.Privilege.Owner.forEach {
+        val islandData = SQLiteer.getIslandData(island)
+        islandData.Privilege.Owner.forEach {
             if (uniqueId.toString() == it.UUID) return true
         }
         return false
@@ -448,8 +448,8 @@ object SkyOperator {
      * @return 玩家是否是岛屿的成员
      */
     fun Player.isJoinedIsland(island: Island): Boolean {
-        val isLandData = SQLiteer.getIsLandData(island)
-        isLandData.Privilege.Member.forEach {
+        val islandData = SQLiteer.getIslandData(island)
+        islandData.Privilege.Member.forEach {
             if (uniqueId.toString() == it.UUID) return true
         }
         return false

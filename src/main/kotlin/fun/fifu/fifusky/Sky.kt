@@ -8,7 +8,7 @@ import kotlin.math.abs
  * MAX_INLAND 世界最大岛屿数的单个边长的和
  *
  * Pair<Int, Int>一律为真实坐标
- * IsLand.SkyLoc一律为岛坐标
+ * Island.SkyLoc一律为岛坐标
  * @author NekokeCore
  */
 object Sky {
