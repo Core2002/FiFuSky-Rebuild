@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.kotlin.jvm' version '1.6.20'
+    id 'org.jetbrains.kotlin.jvm' version '1.6.21'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'maven-publish'
 }
@@ -33,13 +33,11 @@ repositories {
     //国内镜像源
     maven { url 'https://maven.aliyun.com/nexus/content/repositories/jcenter' }
     maven { url 'https://mirrors.huaweicloud.com/repository/maven' }
-    maven { url 'https://dl.bintray.com/kotlin/kotlin-eap' }
     //Minecraft
     maven { url 'https://crystal.lss233.com.aslf.top/repositories/minecraft' }
     maven { url 'https://lss233.com/artifactory/minecraft' }
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
 
-    jcenter()
     google()
     mavenCentral()
 }
