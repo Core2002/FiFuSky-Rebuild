@@ -1,6 +1,5 @@
 import `fun`.fifu.fifusky.Sky
 import org.junit.jupiter.api.Test
-import kotlin.math.abs
 import kotlin.random.Random
 
 

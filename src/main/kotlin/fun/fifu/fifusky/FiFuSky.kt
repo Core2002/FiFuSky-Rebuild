@@ -46,7 +46,7 @@ class FiFuSky : JavaPlugin() {
                     logger.info("扫描 $it")
                     any.register()
                 }
-            }catch (e:Exception){
+            }catch (_:Exception){
             }
         }
 

@@ -28,7 +28,7 @@ class Welcome : Listener {
                 "§a欢迎萌新owo ${event.player.displayName}",
                 "§a使用/s以开始你的空岛生涯",
                 10, 20 * 60 * 60 * 24, 20
-            );
+            )
         }
 
 

@@ -284,7 +284,7 @@ object SkyOperator {
      */
     fun Island.isUnclaimed(): Boolean {
         val privilege = SQLiteer.getIslandData(this).Privilege
-        if (privilege.Owner.isNullOrEmpty())
+        if (privilege.Owner.isEmpty())
             return true
         return false
     }
