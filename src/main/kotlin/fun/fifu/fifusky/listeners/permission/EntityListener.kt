@@ -108,6 +108,7 @@ class EntityListener : Listener {
         if (entity is LivingEntity) {
             if (event.damager is Player) {
                 val player = event.damager as Player
+                entity.showDamage(player)
                 if (entity !is Monster && !player.havePermission() && !Sky.isInIsland(
                         loc.blockX,
                         loc.blockZ,
