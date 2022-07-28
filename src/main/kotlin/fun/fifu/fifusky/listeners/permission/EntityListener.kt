@@ -6,7 +6,6 @@ import `fun`.fifu.fifusky.operators.SkyOperator.havePermission
 import `fun`.fifu.fifusky.operators.SkyOperator.inProtectionRadius
 import `fun`.fifu.fifusky.operators.SkyOperator.inSpawn
 import `fun`.fifu.fifusky.operators.SkyOperator.isSkyWorld
-import `fun`.fifu.fifusky.operators.SkyOperator.showDamage
 import org.bukkit.ChatColor
 import org.bukkit.Chunk
 import org.bukkit.entity.*
@@ -108,7 +107,7 @@ class EntityListener : Listener {
         if (entity is LivingEntity) {
             if (event.damager is Player) {
                 val player = event.damager as Player
-                entity.showDamage(player)
+//                entity.showDamage(player)
                 if (entity !is Monster && !player.havePermission() && !Sky.isInIsland(
                         loc.blockX,
                         loc.blockZ,
@@ -121,7 +120,7 @@ class EntityListener : Listener {
             } else if (event.damager is Projectile) {
                 if ((event.damager as Projectile).shooter is Player) {
                     val player = (event.damager as Projectile).shooter as Player?
-                    if (player != null) entity.showDamage(player)
+//                    if (player != null) entity.showDamage(player)
                     if (entity !is Monster && player != null && !player.havePermission() && !Sky.isInIsland(
                             loc.blockX,
                             loc.blockZ,
