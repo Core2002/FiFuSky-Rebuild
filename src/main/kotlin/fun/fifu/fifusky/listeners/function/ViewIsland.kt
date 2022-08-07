@@ -73,7 +73,7 @@ class ViewIsland : Listener {
      */
     @EventHandler
     fun starView(event: PlayerItemHeldEvent) {
-        if (event.player.inventory.itemInOffHand != FiFuItems.theStar())
+        if (event.player.inventory.itemInOffHand != FiFuItems.theStar() || !event.player.hasPermission("fifu.sky.starview"))
             return
 
         if (viewingAllIndex.contains(event.player.uniqueId.toString())) {
