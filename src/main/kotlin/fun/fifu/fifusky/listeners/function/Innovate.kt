@@ -7,6 +7,7 @@ import org.bukkit.block.Block
 import `fun`.fifu.fifusky.operators.SkyOperator.havePermission
 import `fun`.fifu.fifusky.operators.SkyOperator.inSpawn
 import `fun`.fifu.fifusky.operators.SkyOperator.isSkyWorld
+import `fun`.fifu.fifusky.operators.SkyOperator.sendActionbarMessage
 import org.bukkit.block.Sign
 import org.bukkit.event.EventHandler
 
@@ -37,10 +38,10 @@ class Innovate : Listener {
                 val block: Block = location.block
                 if (block.type == Material.OBSIDIAN) {
                     block.type = Material.LAVA
-                    event.player.sendMessage("你成功将黑曜石转化成了岩浆！")
+                    event.player.sendActionbarMessage("你成功将黑曜石转化成了岩浆！")
                 }
             } else {
-                event.player.sendMessage("你没权限")
+                event.player.sendActionbarMessage("你没权限")
             }
         }
     }
@@ -55,7 +56,7 @@ class Innovate : Listener {
     fun onPlayerDeath(event: PlayerDeathEvent) {
         if (event.entity.location.inSpawn()) {
             if (event.entity.location.blockY < -150) {
-                event.entity.sendMessage("这个世界虽然不完美，我们仍可以治愈自己")
+                event.entity.sendActionbarMessage("这个世界虽然不完美，我们仍可以治愈自己")
             }
         }
     }
@@ -68,7 +69,6 @@ class Innovate : Listener {
     @EventHandler
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (event.hasBlock() && event.clickedBlock != null) {
-            //event.getPlayer().sendMessage("debug1:hasBlock");
             if (event.clickedBlock!!.state is Sign) {
                 val sign: Sign = event.clickedBlock!!.state as Sign
                 val lines: Array<String> = sign.lines
