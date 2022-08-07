@@ -6,6 +6,7 @@ import `fun`.fifu.fifusky.operators.SkyOperator.havePermission
 import `fun`.fifu.fifusky.operators.SkyOperator.inProtectionRadius
 import `fun`.fifu.fifusky.operators.SkyOperator.inSpawn
 import `fun`.fifu.fifusky.operators.SkyOperator.isSkyWorld
+import `fun`.fifu.fifusky.operators.SkyOperator.sendActionbarMessage
 import org.bukkit.ChatColor
 import org.bukkit.Chunk
 import org.bukkit.entity.*
@@ -86,7 +87,7 @@ class EntityListener : Listener {
             return
         }
         if (!player.havePermission()) {
-            player.sendMessage("你没权限")
+            player.sendActionbarMessage("你没权限")
             event.isCancelled = true
         }
     }
@@ -114,7 +115,7 @@ class EntityListener : Listener {
                         Sky.SPAWN
                     )
                 ) {
-                    player.sendMessage("你没权限伤害她！")
+                    player.sendActionbarMessage("你没权限伤害她！")
                     event.isCancelled = true
                 }
             } else if (event.damager is Projectile) {
@@ -127,7 +128,7 @@ class EntityListener : Listener {
                             Sky.SPAWN
                         )
                     ) {
-                        player.sendMessage("你没权限伤害她！")
+                        player.sendActionbarMessage("你没权限伤害她！")
                         event.isCancelled = true
                     }
                 }

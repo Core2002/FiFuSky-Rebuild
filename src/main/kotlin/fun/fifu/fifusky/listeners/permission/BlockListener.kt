@@ -3,6 +3,7 @@ package `fun`.fifu.fifusky.listeners.permission
 import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.operators.SkyOperator.havePermission
 import `fun`.fifu.fifusky.operators.SkyOperator.isSkyWorld
+import `fun`.fifu.fifusky.operators.SkyOperator.sendActionbarMessage
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
@@ -27,7 +28,7 @@ class BlockListener : Listener {
     fun onBlockBreak(event: BlockBreakEvent) {
         if (!event.player.havePermission()) {
             event.isCancelled = true
-            event.player.sendMessage(str)
+            event.player.sendActionbarMessage(str)
         }
     }
 
@@ -54,7 +55,7 @@ class BlockListener : Listener {
             return
         }
         if (!event.player.havePermission()) {
-            event.player.sendMessage(str)
+            event.player.sendActionbarMessage(str)
             event.isCancelled = true
         }
     }
@@ -67,7 +68,7 @@ class BlockListener : Listener {
     @EventHandler
     fun onBucketEmpty(event: PlayerBucketEmptyEvent) {
         if (!event.player.havePermission()) {
-            event.player.sendMessage(str)
+            event.player.sendActionbarMessage(str)
             event.isCancelled = true
         }
     }
@@ -80,7 +81,7 @@ class BlockListener : Listener {
     @EventHandler
     fun onBucketFill(event: PlayerBucketFillEvent) {
         if (!event.player.havePermission()) {
-            event.player.sendMessage(str)
+            event.player.sendActionbarMessage(str)
             event.isCancelled = true
         }
     }

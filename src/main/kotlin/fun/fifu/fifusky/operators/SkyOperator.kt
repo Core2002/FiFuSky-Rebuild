@@ -5,6 +5,7 @@ import `fun`.fifu.fifusky.Island
 import `fun`.fifu.fifusky.Sky
 import `fun`.fifu.fifusky.data.*
 import cn.hutool.core.date.DateUtil
+import `fun`.fifu.utils.ActionbarUtil
 import org.apache.commons.lang.time.DateUtils
 import org.bukkit.*
 import org.bukkit.attribute.Attribute
@@ -506,6 +507,14 @@ object SkyOperator {
     fun Entity.inProtectionRadius(): Boolean {
         if (!location.world.isSkyWorld()) return false
         return location.distance(Spawn) <= SpawnProtectionRadius
+    }
+
+    /**
+     * 发送操作栏信息
+     * @param message 信息内容
+     */
+    fun Player.sendActionbarMessage(message: String) {
+        ActionbarUtil.sendMessage(this, message)
     }
 
 }
