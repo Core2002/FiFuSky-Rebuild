@@ -399,12 +399,10 @@ class SkyCommand : TabExecutor {
                 val zz = Random.nextInt(-Sky.MAX_ISLAND * Sky.SIDE, Sky.MAX_ISLAND * Sky.SIDE + 1)
                 temp = Sky.getIsland(xx, zz)
             } while (SQLiteer.getIslandData(temp).Privilege.Owner.isNotEmpty())
-
-            temp.build()
-
             val iLD = SQLiteer.getIslandData(temp)
             iLD.Privilege.Owner.add(PlayerData(p0.uniqueId.toString(), p0.name))
             SkyOperator.playerGetOver(p0, iLD)
+            temp.build()
             temp
         }
 
