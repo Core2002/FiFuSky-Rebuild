@@ -62,7 +62,7 @@ class ViewIsland : Listener {
                     player.tpIsland(next)
                     player.sendMessage("${canViewIsland.indexOf(next)} / ${canViewIsland.indices.last} : ${next.SkyLoc} ${next.getOwnersList()}")
                 }
-            }.runTaskTimer(FiFuSky.fs, 0, 20 * 10)
+            }.runTaskTimer(FiFuSky.fs, 0, 20L * 10)
         }
     }
 

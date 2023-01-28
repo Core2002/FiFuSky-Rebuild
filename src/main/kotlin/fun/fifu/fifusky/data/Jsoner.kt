@@ -9,7 +9,7 @@ import java.io.File
  * @author NekokeCore
  */
 object Jsoner {
-    var cache: LFUFileCache = LFUFileCache(1000, 50, 8 * 1000)
+    var cache: LFUFileCache = LFUFileCache(1000, 50, 8 * 1000L)
     private val PlayerLastGet: File = File("plugins/FiFuSky/PlayerLastGet.json")
     private val FiFuAdminList: File = File("plugins/FiFuSky/FiFuAdminList.json")
 

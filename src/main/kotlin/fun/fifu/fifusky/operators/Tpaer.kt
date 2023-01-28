@@ -46,7 +46,7 @@ object Tpaer {
                     if (!tpaRequest.remove(f).isNullOrEmpty())
                         from.sendMessage("向玩家 ${goto.name} 发起传送请求已销毁")
                 }
-            }.runTaskLater(FiFuSky.fs, 20 * 8)
+            }.runTaskLater(FiFuSky.fs, 20L * 8)
         }
     }
 }
